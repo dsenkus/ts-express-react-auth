@@ -1,28 +1,8 @@
-import { server } from "../app";
-import { redisStore } from '../utils/redis';
+import { server } from "../../app";
 import * as request from "supertest";
-import { insertUser, confirmUser, findUserByEmail } from "../utils/db";
-import { query, dbClose } from "../db";
+import { insertUser, confirmUser, findUserByEmail } from "../../utils/db";
 import * as HttpStatus from 'http-status-codes';
-import * as redis from 'redis';
-import * as redisMock from 'redis-mock';
-import { buildErrorJson, UnauthorizedError, InvalidAuthCredentialsError } from "../utils/errors";
-
-jest.spyOn(redis, 'createClient').mockImplementation(redisMock.createClient);
-
-// close the server after each test
-beforeEach(async (): Promise<void> => {
-    await query('DELETE FROM users');
-});
-
-afterEach((): void => {
-    server.close();
-});
-
-afterAll((): void => {
-    dbClose();
-    redisStore.client.quit();
-});
+import { buildErrorJson, UnauthorizedError, InvalidAuthCredentialsError } from "../../utils/errors";
 
 const createUser = async (): Promise<User> => {
     const email = 'test@test.com';
