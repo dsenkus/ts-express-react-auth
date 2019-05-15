@@ -1,4 +1,4 @@
-import { server } from "../../app";
+import app from "../../app";
 import * as request from "supertest";
 import { insertUser, confirmUser, findUserByEmail } from "../../utils/db";
 import * as HttpStatus from 'http-status-codes';
@@ -16,7 +16,7 @@ const createUser = async (): Promise<User> => {
 }
 
 const authenticateUser = async (user: User): Promise<string> => {
-    const authenticate = await request(server)
+    const authenticate = await request(app)
         .post('/auth/login')
         .send({ email: user.email, password: user.password });
     const sessionCookie = authenticate.header['set-cookie'][0].split(';')[0];
@@ -25,7 +25,7 @@ const authenticateUser = async (user: User): Promise<string> => {
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
-        const result = await request(server).get('/auth/whoami');
+        const result = await request(app).get('/auth/whoami');
 
         expect(result.body).toEqual({
             error: buildErrorJson(new UnauthorizedError())
@@ -36,7 +36,7 @@ describe("GET /auth/whoami", (): void => {
     it("should return authenticated user data", async (): Promise<void> => {
         const user = await createUser();
         const cookie = await authenticateUser(user);
-        const result = await request(server)
+        const result = await request(app)
             .get('/auth/whoami')
             .set('Cookie', [cookie])
 
@@ -47,7 +47,7 @@ describe("GET /auth/whoami", (): void => {
 
 describe("POST /auth/login", (): void => {
     it("it should fail when email invalid", async (): Promise<void> => {
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/login')
             .send({email: 'invalid@email.com', password: 'invalid'});
         
@@ -60,7 +60,7 @@ describe("POST /auth/login", (): void => {
     it("it should fail when password invalid", async (): Promise<void> => {
         const { email } = await createUser();
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/login')
             .send({email, password: 'badpassword'});
         
@@ -75,7 +75,7 @@ describe("POST /auth/login", (): void => {
         const password = 'password';
         await insertUser('John Doe', email, password);
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/login')
             .send({email, password });
         
@@ -88,7 +88,7 @@ describe("POST /auth/login", (): void => {
     it("it should set HttpOnly session cookie when success", async (): Promise<void> => {
         const { email, password } = await createUser();
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/login')
             .send({ email, password });
 
@@ -102,7 +102,7 @@ describe("POST /auth/register", (): void => {
     it("should create new unconfirmed user", async (): Promise<void> => {
         const [name, email, password] = ['John Doe', 'test@test.com', 'testpass'];
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/register')
             .send({ name, email, password });
 
@@ -116,7 +116,7 @@ describe("POST /auth/register", (): void => {
     it("should fail when data is not provided", async (): Promise<void> => {
         const [name, email, password] = ['', '', ''];
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/register')
             .send({ name, email, password });
 
@@ -131,7 +131,7 @@ describe("POST /auth/register", (): void => {
         const { email } = await createUser();
         const [name, password] = ['Jane Doe', 'testpass'];
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/register')
             .send({ name, email, password });
 
@@ -143,7 +143,7 @@ describe("POST /auth/register", (): void => {
 
 describe("POST /auth/logout", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
-        const result = await request(server).post('/auth/logout');
+        const result = await request(app).post('/auth/logout');
 
         expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
         expect(result.body).toEqual({
@@ -155,13 +155,13 @@ describe("POST /auth/logout", (): void => {
         const user = await createUser();
         const cookie = await authenticateUser(user);
 
-        const result = await request(server)
+        const result = await request(app)
             .post('/auth/logout')
             .set('Cookie', [cookie])
 
         expect(result.status).toEqual(HttpStatus.OK);
 
-        const checkLogout = await request(server)
+        const checkLogout = await request(app)
             .post('/auth/logout')
             .set('Cookie', [cookie])
 

@@ -4,6 +4,7 @@ import * as express from 'express';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
+import * as path from 'path';
 import authRoutes from './routes/auth';
 import { buildErrorJson } from './utils/errors';
 import { localAuthStrategy } from './auth/strategies/local';
@@ -12,7 +13,9 @@ import { redisStore } from './utils/redis';
 
 // initialize env variables
 if(process.env.NODE_ENV !== 'production') {
-    dotenv.config();
+    dotenv.config({
+        path: path.resolve(process.cwd(), process.env.NODE_ENV === 'test' ? '.env.test' :'.env')
+    });
 }
 
 const app = express();
@@ -70,4 +73,4 @@ app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
 // Application error logging.
 app.on('error', console.error);
 
-export const server = app.listen(process.env.PORT);
+export default app;
