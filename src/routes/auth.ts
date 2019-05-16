@@ -1,7 +1,7 @@
 import * as passport from 'passport';
 import Router from 'express-promise-router';
-import { insertUser } from '../queries/users';
-import { InvalidAuthCredentialsError } from '../errors';
+import { insertUser, confirmUser } from '../queries/users';
+import { InvalidAuthCredentialsError, InvalidConfirmationTokenError } from '../errors';
 import { userCreateSchema } from '../validators/users';
 import { isAuthenticated } from '../utils';
 
@@ -26,6 +26,19 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
     await insertUser(req.body);
+    res.status(200).send();
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/confirm :: Confirm user account
+// -----------------------------------------------------------------------------
+
+router.post('/confirm', async (req, res): Promise<void> => {
+    const { token } = req.body;
+
+    const user = await confirmUser(token);
+    if(!user) throw new InvalidConfirmationTokenError();
+
     res.status(200).send();
 });
 

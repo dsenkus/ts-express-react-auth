@@ -1,7 +1,7 @@
 import * as HttpStatus from 'http-status-codes';
 import * as request from 'supertest';
 import app from '../../app';
-import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError } from '../../errors';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError } from '../../errors';
 import { createUser, authenticateUser, buildUserData } from '../utils';
 import { findUserByEmail, insertUser } from '../../queries/users';
 
@@ -149,6 +149,35 @@ describe("POST /auth/logout", (): void => {
         expect(checkLogout.status).toEqual(HttpStatus.UNAUTHORIZED);
         expect(checkLogout.body).toEqual({
             error: buildErrorJson(new UnauthorizedError())
+        });
+    });
+});
+
+describe("POST /auth/confirm", (): void => {
+    it("should confirm user", async (): Promise<void> => {
+        const data = buildUserData();
+        const user = await insertUser(data);
+        expect(user.confirmed).toBeFalsy();
+
+        const result = await request(app)
+            .post('/auth/confirm')
+            .send({ token: user.confirm_token });
+
+        expect(result.status).toEqual(HttpStatus.OK);
+
+        const confirmedUser = await findUserByEmail(user.email);
+        expect(confirmedUser.email).toEqual(user.email);
+        expect(confirmedUser.confirmed).toBeTruthy();
+    });
+
+    it("should return error when token invalid", async (): Promise<void> => {
+        const result = await request(app)
+            .post('/auth/confirm')
+            .send({ token: 'invalid' });
+
+        expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(result.body).toEqual({
+            error: buildErrorJson(new InvalidConfirmationTokenError())
         });
     });
 });

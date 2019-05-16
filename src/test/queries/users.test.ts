@@ -29,6 +29,7 @@ describe("users queries", (): void => {
             expect(user.email).toEqual(data.email);
             expect(user.name).toEqual(data.name);
             expect(user.confirmed).toEqual(false);
+            expect(user.confirm_token.length).toEqual(32);
         });
 
         it("should throw exception when duplicate email was provided", async (): Promise<void> => {

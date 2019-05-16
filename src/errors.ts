@@ -36,6 +36,12 @@ export class UnauthorizedError extends ApplicationError {
     }
 }
 
+export class InvalidConfirmationTokenError extends ApplicationError {
+    public constructor(data?: any) {
+        super('Invalid Confirmation Token', data, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+}
+
 /**
  * Get default app error.
  */
