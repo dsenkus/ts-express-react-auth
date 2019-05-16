@@ -6,8 +6,10 @@
   "scripts": {
     "build": "tsc",
     "serve": "ts-node src/index.ts",
-    "test": "jest",
-    "start": "nodemon"
+    "test": "jest --runInBand",
+    "start": "nodemon",
+    "docker:db:start": "docker-compose up",
+    "docker:db:rebuild": "docker-compose down && docker volume rm ts-auth_ts_auth && docker-compose build"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +21,7 @@
     "@types/express": "^4.16.1",
     "@types/express-promise-router": "^2.0.1",
     "@types/express-session": "^1.15.12",
+    "@types/faker": "^4.1.5",
     "@types/http-status-codes": "^1.2.0",
     "@types/jest": "^24.0.12",
     "@types/node": "^12.0.0",
@@ -38,6 +41,7 @@
     "express": "^4.16.4",
     "express-promise-router": "^3.0.3",
     "express-session": "^1.16.1",
+    "faker": "^4.1.0",
     "http-status-codes": "^1.3.2",
     "jest": "^24.8.0",
     "nodemon": "^1.19.0",

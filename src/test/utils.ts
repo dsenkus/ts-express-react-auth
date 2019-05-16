@@ -1,18 +1,29 @@
 import * as request from 'supertest';
 import app from '../app';
+import * as faker from 'faker';
 import { confirmUser, insertUser } from '../queries/users';
+
+/**
+ * Builds new user data.
+ */
+export const buildUserData = (data: UserCreateDataOptional = {}): UserCreateData => ({
+    email: faker.internet.email(),
+    name: `${faker.name.findName()} ${faker.name.lastName()}`,
+    password: faker.random.alphaNumeric(8),
+    ...data,
+});
 
 /**
  * Creates new confirmed user and adds it to database.
  */
 export const createUser = async (): Promise<User> => {
-    const email = 'test@test.com';
-    const password = 'password';
-    const user = await insertUser('John Doe', email, password);
-    await confirmUser(user.id);
+    const data = buildUserData();
+    const user = await insertUser(data);
+    await confirmUser(user.confirm_token);
     return { 
         ...user,
-        password
+        confirmed: true,
+        password: data.password
     };
 }
 /**
@@ -23,5 +34,5 @@ export const authenticateUser = async (user: User): Promise<string> => {
         .post('/auth/login')
         .send({ email: user.email, password: user.password });
     const sessionCookie = authenticate.header['set-cookie'][0].split(';')[0];
-    return sessionCookie
+    return sessionCookie;
 }

@@ -7,5 +7,5 @@ Work in progress...
 ```
 docker-compose down
 docker volume rm ts-auth_ts_auth
-docker-compse up --force-recreate
+docker-compose build
 ```

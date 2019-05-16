@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import * as request from 'supertest';
 import app from '../../app';
 import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError } from '../../errors';
-import { createUser, authenticateUser } from '../utils';
+import { createUser, authenticateUser, buildUserData } from '../utils';
 import { findUserByEmail, insertUser } from '../../queries/users';
 
 describe("GET /auth/whoami", (): void => {
@@ -53,13 +53,12 @@ describe("POST /auth/login", (): void => {
     });
 
     it("it should fail when user not confirmed", async (): Promise<void> => {
-        const email = 'test@test.com';
-        const password = 'password';
-        await insertUser('John Doe', email, password);
+        const data = buildUserData();
+        await insertUser(data);
 
         const result = await request(app)
             .post('/auth/login')
-            .send({email, password });
+            .send({ email: data.email, password: data.password });
         
         expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
         expect(result.body).toEqual({
@@ -82,7 +81,7 @@ describe("POST /auth/login", (): void => {
 
 describe("POST /auth/register", (): void => {
     it("should create new unconfirmed user", async (): Promise<void> => {
-        const [name, email, password] = ['John Doe', 'test@test.com', 'testpass'];
+        const { name, email, password } = buildUserData();
 
         const result = await request(app)
             .post('/auth/register')

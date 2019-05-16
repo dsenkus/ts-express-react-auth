@@ -21,6 +21,7 @@ CREATE TABLE users (
   email TEXT UNIQUE NOT NULL,  
   password TEXT NOT NULL,
   confirmed BOOLEAN NOT NULL DEFAULT FALSE,
+  confirm_token TEXT NOT NULL DEFAULT md5(random()::text),
   reset_password_token TEXT NOT NULL DEFAULT md5(random()::text),
   reset_password_expires TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
   created_at TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,

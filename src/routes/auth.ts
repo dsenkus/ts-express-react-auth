@@ -25,9 +25,7 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
-
-    const { name, email, password } = req.body;
-    await insertUser(name, email, password)
+    await insertUser(req.body);
     res.status(200).send();
 });
 
