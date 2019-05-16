@@ -1,8 +1,8 @@
 import * as yup from 'yup';
-import * as bcrypt from 'bcrypt';
-import { findUserByEmail } from './db';
+import { findUserByEmail } from '../queries/users';
 
 const userPasswordValidator = yup.string().required().min(5).max(256);
+
 const userEmailValidator = yup.string().required().email().max(256).test({
     name: 'taken',
     message: 'email already taken',

@@ -1,7 +1,10 @@
 import * as request from 'supertest';
 import app from '../app';
-import { confirmUser, insertUser } from '../utils/db';
+import { confirmUser, insertUser } from '../queries/users';
 
+/**
+ * Creates new confirmed user and adds it to database.
+ */
 export const createUser = async (): Promise<User> => {
     const email = 'test@test.com';
     const password = 'password';
@@ -12,7 +15,9 @@ export const createUser = async (): Promise<User> => {
         password
     };
 }
-
+/**
+ * Authenticates `user` and returns session id.
+ */
 export const authenticateUser = async (user: User): Promise<string> => {
     const authenticate = await request(app)
         .post('/auth/login')

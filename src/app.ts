@@ -6,10 +6,10 @@ import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
 import * as path from 'path';
 import authRoutes from './routes/auth';
-import { buildErrorJson } from './utils/errors';
+import { buildErrorJson } from './errors';
 import { localAuthStrategy } from './auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
-import { redisStore } from './utils/redis';
+import { redisStore } from './redis';
 
 // initialize env variables
 if(process.env.NODE_ENV !== 'production') {

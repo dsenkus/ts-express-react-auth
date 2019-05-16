@@ -1,11 +1,15 @@
-import Router from 'express-promise-router';
-import { InvalidAuthCredentialsError } from '../utils/errors';
 import * as passport from 'passport';
-import { isAuthenticated } from '../utils/isAuthenticated';
-import { insertUser } from '../utils/db';
-import { userCreateSchema } from '../utils/validators';
+import Router from 'express-promise-router';
+import { insertUser } from '../queries/users';
+import { InvalidAuthCredentialsError } from '../errors';
+import { userCreateSchema } from '../validators/users';
+import { isAuthenticated } from '../utils';
 
 const router = Router();
+
+// -----------------------------------------------------------------------------
+// GET /auth/whoami :: Return current authenticated user
+// -----------------------------------------------------------------------------
 
 router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
     const user = req.user;
@@ -15,10 +19,9 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
     });
 });
 
-router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
-    req.logOut();
-    res.status(200).send();
-});
+// -----------------------------------------------------------------------------
+// POST /auth/register :: Create new user
+// -----------------------------------------------------------------------------
 
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
@@ -28,8 +31,12 @@ router.post('/register', async (req, res): Promise<void> => {
     res.status(200).send();
 });
 
+// -----------------------------------------------------------------------------
+// POST /auth/login :: Authenticate user
+// -----------------------------------------------------------------------------
+
 router.post('/login', (req, res, next): any => {
-    passport.authenticate('login', {}, (err, user, info): any => {
+    passport.authenticate('login', (err, user, info): any => {
         if(err || !user) return next(new InvalidAuthCredentialsError());
 
         // create user session
@@ -39,6 +46,15 @@ router.post('/login', (req, res, next): any => {
         });
 
     })(req, res, next);
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/logout :: Delete user session
+// -----------------------------------------------------------------------------
+
+router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
+    req.logOut();
+    res.status(200).send();
 });
 
 export default router;

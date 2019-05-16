@@ -1,6 +1,9 @@
 import * as HttpStatus from 'http-status-codes';
 import { ValidationError as YupValidationError } from 'yup';
 
+/**
+ * Base class for all errors.
+ */
 export class ApplicationError extends Error {
     public status: number;
     public data: any;
@@ -33,12 +36,18 @@ export class UnauthorizedError extends ApplicationError {
     }
 }
 
+/**
+ * Get default app error.
+ */
 const getDefaultError = (): JsonError => ({
     type: 'InternalServerError',
     message: 'Internal Server Error',
     status: HttpStatus.INTERNAL_SERVER_ERROR,
 });
 
+/**
+ * Builds ValidationError from `Yup` error. 
+ */
 const getValidationError = (error: YupValidationError): JsonError => {
     return {
         type: 'ValidationError',
@@ -51,21 +60,27 @@ const getValidationError = (error: YupValidationError): JsonError => {
     }
 }
 
+/**
+ * Builds error in JSON format. 
+ */
 export const buildErrorJson = (error: any): JsonError => {
+    // check for Yup validation errors
     if(error instanceof YupValidationError) return getValidationError(error);
-    if(!('message' in error)) return getDefaultError();
-    if(!('status' in error)) return getDefaultError();
-    if(!('type' in error)) return getDefaultError();
 
-    const errorJson: JsonError = {
+    // check if error contains necessary fields
+    if(!('message' in error || 'status' in error || 'type' in error)) {
+        return getDefaultError();
+    }
+
+    const json: JsonError = {
         type: error.type,
         message: error.message,
         status: error.status,
     }
 
     if(error.data) {
-        errorJson.data = error.data;
+        json.data = error.data;
     }
 
-    return errorJson;
+    return json;
 }

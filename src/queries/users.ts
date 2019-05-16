@@ -1,5 +1,5 @@
 import { query } from "../db";
-import { encryptPassword } from "./utils";
+import { encryptPassword } from "../utils";
 
 export const findUserByEmail = async (email: string): Promise<User> => {
     const sql = 'SELECT * FROM users WHERE email = $1';
@@ -15,7 +15,7 @@ export const insertUser = async(name: string, email: string, password: string): 
 }
 
 export const confirmUser = async(id: string): Promise<User> => {
-    const sql = 'UPDATE users SET confirmed = true WHERE id = $1';
+    const sql = 'UPDATE users SET confirmed = true WHERE id = $1 RETURNING *';
     const result = await query(sql, [id]);
     return result.rows[0] as User;
 }

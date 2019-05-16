@@ -1,9 +1,9 @@
 import * as HttpStatus from 'http-status-codes';
 import * as request from 'supertest';
 import app from '../../app';
-import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError } from '../../utils/errors';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError } from '../../errors';
 import { createUser, authenticateUser } from '../utils';
-import { findUserByEmail, insertUser } from '../../utils/db';
+import { findUserByEmail, insertUser } from '../../queries/users';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
