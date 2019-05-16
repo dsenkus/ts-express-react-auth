@@ -1,27 +1,9 @@
-import app from "../../app";
-import * as request from "supertest";
-import { insertUser, confirmUser, findUserByEmail } from "../../utils/db";
 import * as HttpStatus from 'http-status-codes';
-import { buildErrorJson, UnauthorizedError, InvalidAuthCredentialsError } from "../../utils/errors";
-
-const createUser = async (): Promise<User> => {
-    const email = 'test@test.com';
-    const password = 'password';
-    const user = await insertUser('John Doe', email, password);
-    await confirmUser(user.id);
-    return { 
-        ...user,
-        password
-    };
-}
-
-const authenticateUser = async (user: User): Promise<string> => {
-    const authenticate = await request(app)
-        .post('/auth/login')
-        .send({ email: user.email, password: user.password });
-    const sessionCookie = authenticate.header['set-cookie'][0].split(';')[0];
-    return sessionCookie
-}
+import * as request from 'supertest';
+import app from '../../app';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError } from '../../utils/errors';
+import { createUser, authenticateUser } from '../utils';
+import { findUserByEmail, insertUser } from '../../utils/db';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
@@ -162,12 +144,12 @@ describe("POST /auth/logout", (): void => {
         expect(result.status).toEqual(HttpStatus.OK);
 
         const checkLogout = await request(app)
-            .post('/auth/logout')
+            .get('/auth/whoami')
             .set('Cookie', [cookie])
 
+        expect(checkLogout.status).toEqual(HttpStatus.UNAUTHORIZED);
         expect(checkLogout.body).toEqual({
             error: buildErrorJson(new UnauthorizedError())
         });
-        expect(checkLogout.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
 });
