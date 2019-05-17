@@ -10,7 +10,7 @@ declare interface User {
     confirmed: boolean;
     confirm_token: string;
     reset_password_token: string;
-    reset_password_expires: string;
+    reset_password_created_at: string;
     created_at: string;
     updated_at: string;
 }

@@ -18,3 +18,7 @@ export const userCreateSchema = yup.object().shape({
     email: userEmailValidator,
     password: userPasswordValidator,
 });
+
+export const userPasswordChangeSchema = yup.object({
+    password: userPasswordValidator
+});

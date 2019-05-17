@@ -1,9 +1,11 @@
 import * as HttpStatus from 'http-status-codes';
+import * as faker from 'faker';
 import * as request from 'supertest';
 import app from '../../app';
-import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError } from '../../errors';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
 import { createUser, authenticateUser, buildUserData } from '../utils';
-import { findUserByEmail, insertUser } from '../../queries/users';
+import { isPasswordValid, generateResetPasswordParam } from '../../utils';
+import { findUserByEmail, insertUser, generateResetPasswordToken } from '../../queries/users';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
@@ -179,5 +181,71 @@ describe("POST /auth/confirm", (): void => {
         expect(result.body).toEqual({
             error: buildErrorJson(new InvalidConfirmationTokenError())
         });
+    });
+});
+
+describe("POST /auth/reset_password", (): void => {
+    it("it should send password reset email if only email param is provided", async (): Promise<void> => {
+        const { email } = await createUser();
+
+        const result = await request(app)
+            .post('/auth/reset_password')
+            .send({ email });
+
+        expect(result.status).toEqual(HttpStatus.OK);
+    });
+
+    it("should reset password if token and password is provided", async (): Promise<void> => {
+        const user = await createUser();
+        const newPassword = faker.random.alphaNumeric(10)  
+        const token = generateResetPasswordParam(user)
+
+        const result = await request(app)
+            .post(`/auth/reset_password/${token}`)
+            .send({ password: newPassword });
+
+        const updatedUser = await findUserByEmail(user.email);
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        expect(updatedUser.password).not.toEqual(user.password);
+        const passwordValid = await isPasswordValid(newPassword, updatedUser.password);
+        expect(passwordValid).toBeTruthy();
+    });
+
+    it("should validate new password", async (): Promise<void> => {
+        const user = await createUser();
+        const newPassword = faker.random.alphaNumeric(3)  
+        const token = generateResetPasswordParam(user)
+
+        const result = await request(app)
+            .post(`/auth/reset_password/${token}`)
+            .send({ password: newPassword });
+
+
+        expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(result.body.error.data.password).toMatch(/must be at least/);
+
+        // check if password has not changed
+        const updatedUser = await findUserByEmail(user.email);
+        const passwordValid = await isPasswordValid(user.password, updatedUser.password);
+        expect(passwordValid).toBeTruthy();
+    });
+
+    it("should fail if token not valid", async (): Promise<void> => {
+        const { email, password } = await createUser();
+
+        const result = await request(app)
+            .post('/auth/reset_password/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+            .send({ password: faker.random.alphaNumeric(10) });
+
+        expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(result.body).toEqual({
+            error: buildErrorJson(new InvalidPasswordResetTokenError())
+        });
+
+        // check if password has not changed
+        const updatedUser = await findUserByEmail(email);
+        const passwordValid = await isPasswordValid(password, updatedUser.password);
+        expect(passwordValid).toBeTruthy();
     });
 });

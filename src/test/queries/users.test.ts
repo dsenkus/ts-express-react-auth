@@ -1,5 +1,8 @@
-import { createUser, buildUserData } from '../utils';
-import { findUserByEmail, insertUser, confirmUser } from '../../queries/users';
+import * as faker from 'faker';
+import * as dateFns from 'date-fns';
+import { buildUserData, createUser } from '../utils';
+import { confirmUser, findUserByEmail, generateResetPasswordToken, insertUser, resetPasswordWithToken } from '../../queries/users';
+import { isPasswordValid } from '../../utils';
 
 describe("users queries", (): void => {
     describe("findUserByEmail", (): void => {
@@ -58,6 +61,46 @@ describe("users queries", (): void => {
         it("should return null when token invalid", async (): Promise<void> => {
             const confirmedUser = await confirmUser('invalidtoken');
             expect(confirmedUser).toEqual(null);
+        });
+    });
+
+    describe("generateResetPasswordToken", (): void => {
+        it("should generate new token and set it's creation date", async (): Promise<void> => {
+            const user = await createUser();
+            const result = await generateResetPasswordToken(user.id);
+
+            expect(result.reset_password_token).not.toEqual(user.reset_password_token);
+            expect(result.reset_password_created_at).not.toEqual(user.reset_password_created_at);
+            expect(result.reset_password_token.length).toEqual(32);
+            expect(dateFns.differenceInMilliseconds(new Date(), result.reset_password_created_at)).toBeLessThan(100);
+        });
+
+        it("should return null when user id invalid", async (): Promise<void> => {
+            const confirmedUser = await generateResetPasswordToken(faker.random.uuid());
+            expect(confirmedUser).toEqual(null);
+        });
+    });
+
+    describe("resetPasswordWithToken", (): void => {
+        it("should change password and generate new token", async (): Promise<void> => {
+            const user = await createUser();
+            const result = await resetPasswordWithToken(user.id, user.reset_password_token, 'newpassword');
+
+            expect(result.reset_password_token).not.toEqual(user.reset_password_token);
+            expect(result.reset_password_created_at).not.toEqual(user.reset_password_created_at);
+            expect(result.reset_password_token.length).toEqual(32);
+            expect(dateFns.differenceInMilliseconds(new Date(), result.reset_password_created_at)).toBeLessThan(100);
+            const passwordValid = await isPasswordValid('newpassword', result.password);
+            expect (passwordValid).toBeTruthy();
+        });
+
+        it("should return null if user id/reset_password_token is wrong", async (): Promise<void> => {
+            const result = await resetPasswordWithToken(
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 
+                'newpassword');
+
+            expect(result).toBeNull();
         });
     });
 });

@@ -1,9 +1,11 @@
 import * as passport from 'passport';
 import Router from 'express-promise-router';
-import { insertUser, confirmUser } from '../queries/users';
-import { InvalidAuthCredentialsError, InvalidConfirmationTokenError } from '../errors';
-import { userCreateSchema } from '../validators/users';
+import { insertUser, confirmUser, findUserByEmail, resetPasswordWithToken } from '../queries/users';
+import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../errors';
+import { userCreateSchema, userPasswordChangeSchema } from '../validators/users';
 import { isAuthenticated } from '../utils';
+import { parseResetPasswordParam } from '../utils';
+import { sendPasswordResetEmail } from '../mail/passwordResetEmail';
 
 const router = Router();
 
@@ -65,6 +67,41 @@ router.post('/login', (req, res, next): any => {
 
 router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
     req.logOut();
+    res.status(200).send();
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/reset_password :: Send reset password email
+// -----------------------------------------------------------------------------
+
+router.post('/reset_password', async (req, res): Promise<void> => {
+    const { email } = req.body;
+
+    const user = await findUserByEmail(email);
+    if(user) sendPasswordResetEmail(user);
+
+    res.status(200).send();
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/reset_password/:token :: Reset user password
+// -----------------------------------------------------------------------------
+
+router.post('/reset_password/:token', async (req, res): Promise<void> => {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    // parse token
+    const tokenData = parseResetPasswordParam(token);
+    if(!tokenData) throw new InvalidPasswordResetTokenError();
+
+    // validate password
+    await userPasswordChangeSchema.validate(req.body, { abortEarly: false });
+
+    // update password
+    const user = await resetPasswordWithToken(tokenData.id, tokenData.token, password);
+    if(!user) throw new InvalidPasswordResetTokenError();
+
     res.status(200).send();
 });
 

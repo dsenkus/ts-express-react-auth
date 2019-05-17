@@ -18,6 +18,12 @@ export class ApplicationError extends Error {
     }
 }
 
+export class InternalServerError extends ApplicationError {
+    public constructor(message: string = 'Internal Server Error', data?: any) {
+        super(message, data, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
 export class InvalidAuthCredentialsError extends ApplicationError {
     public constructor(data?: any) {
         super('Invalid Email or Password', data, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -27,6 +33,12 @@ export class InvalidAuthCredentialsError extends ApplicationError {
 export class InvalidAuthTokenError extends ApplicationError {
     public constructor(data?: any) {
         super('Invalid Authorization Token', data, HttpStatus.UNAUTHORIZED);
+    }
+}
+
+export class InvalidPasswordResetTokenError extends ApplicationError {
+    public constructor(data?: any) {
+        super('Invalid Password Reset Token', data, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }
 

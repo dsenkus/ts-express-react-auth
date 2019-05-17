@@ -23,7 +23,7 @@ CREATE TABLE users (
   confirmed BOOLEAN NOT NULL DEFAULT FALSE,
   confirm_token TEXT NOT NULL DEFAULT md5(random()::text),
   reset_password_token TEXT NOT NULL DEFAULT md5(random()::text),
-  reset_password_expires TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
+  reset_password_created_at TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
   created_at TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT current_timestamp
 );
