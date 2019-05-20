@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
+    "start": "NODE_ENV=production npx pm2 start pm2.yaml",
     "build": "tsc",
     "serve": "ts-node src/server.ts",
     "test": "NODE_ENV=test jest --runInBand",
@@ -82,5 +83,8 @@
     "testMatch": [
       "**/?(*.)+(spec|test).ts?(x)"
     ]
+  },
+  "dependencies": {
+    "pm2": "^3.5.0"
   }
 }
