@@ -5,7 +5,7 @@ import app from '../../app';
 import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
 import { createUser, authenticateUser, buildUserData } from '../utils';
 import { isPasswordValid, generateResetPasswordParam } from '../../utils';
-import { findUserByEmail, insertUser, generateResetPasswordToken } from '../../queries/users';
+import users from '../../entities/users';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {
@@ -56,7 +56,7 @@ describe("POST /auth/login", (): void => {
 
     it("it should fail when user not confirmed", async (): Promise<void> => {
         const data = buildUserData();
-        await insertUser(data);
+        await users.insertUser(data);
 
         const result = await request(app)
             .post('/auth/login')
@@ -89,7 +89,7 @@ describe("POST /auth/register", (): void => {
             .post('/auth/register')
             .send({ name, email, password });
 
-        const user = await findUserByEmail(email) as User;
+        const user = await users.findUserByEmail(email) as User;
         expect(result.status).toEqual(HttpStatus.OK);
         expect(user.email).toEqual(email);
         expect(user.name).toEqual(name);
@@ -158,7 +158,7 @@ describe("POST /auth/logout", (): void => {
 describe("POST /auth/confirm", (): void => {
     it("should confirm user", async (): Promise<void> => {
         const data = buildUserData();
-        const user = await insertUser(data);
+        const user = await users.insertUser(data);
         expect(user.confirmed).toBeFalsy();
 
         const result = await request(app)
@@ -167,7 +167,7 @@ describe("POST /auth/confirm", (): void => {
 
         expect(result.status).toEqual(HttpStatus.OK);
 
-        const confirmedUser = await findUserByEmail(user.email) as User;
+        const confirmedUser = await users.findUserByEmail(user.email) as User;
         expect(confirmedUser.email).toEqual(user.email);
         expect(confirmedUser.confirmed).toBeTruthy();
     });
@@ -204,7 +204,7 @@ describe("POST /auth/reset_password", (): void => {
             .post(`/auth/reset_password/${token}`)
             .send({ password: newPassword });
 
-        const updatedUser = await findUserByEmail(user.email) as User;
+        const updatedUser = await users.findUserByEmail(user.email) as User;
 
         expect(result.status).toEqual(HttpStatus.OK);
         expect(updatedUser.password).not.toEqual(user.password);
@@ -226,7 +226,7 @@ describe("POST /auth/reset_password", (): void => {
         expect(result.body.error.data.password).toMatch(/must be at least/);
 
         // check if password has not changed
-        const updatedUser = await findUserByEmail(user.email) as User;
+        const updatedUser = await users.findUserByEmail(user.email) as User;
         const passwordValid = await isPasswordValid(user.password, updatedUser.password);
         expect(passwordValid).toBeTruthy();
     });
@@ -244,7 +244,7 @@ describe("POST /auth/reset_password", (): void => {
         });
 
         // check if password has not changed
-        const updatedUser = await findUserByEmail(email) as User;
+        const updatedUser = await users.findUserByEmail(email) as User;
         const passwordValid = await isPasswordValid(password, updatedUser.password);
         expect(passwordValid).toBeTruthy();
     });

@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { findUserByEmail } from '../queries/users';
+import { findUserByEmail } from './queries';
 
 const userPasswordValidator = yup.string().required().min(5).max(256);
 

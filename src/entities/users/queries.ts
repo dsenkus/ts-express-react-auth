@@ -1,27 +1,5 @@
-import { query } from "../db";
-import { encryptPassword } from "../utils";
-import { QueryResult } from "pg";
-
-/**
- * Returns first row from QueryResult or null.
- * 
- * @param promise node-postgres Promsie<QueryResult>
- */
-async function firstOrNull<T>(promise: Promise<QueryResult>): Promise<T | null> {
-    const result = await promise;
-    return result.rowCount > 0 ? result.rows[0] as T : null;
-}
-
-/**
- * Returns first row from QueryResult or throws an error.
- * 
- * @param result node-postgres QueryResult
- */
-async function firstOrError<T>(promise: Promise<QueryResult>): Promise<T> {
-    const result = await promise;
-    if(result.rowCount < 1) throw new Error(`Query returned empty result set ${result.command}`);
-    return result.rows[0];
-}
+import { query } from "../../db";
+import { encryptPassword, firstOrError } from "../../utils";
 
 export async function findUserByEmail(email: string): Promise<User> {
     const sql = 'SELECT * FROM users WHERE email = $1';

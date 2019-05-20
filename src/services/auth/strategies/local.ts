@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import * as local from 'passport-local';
-import { findUserByEmail } from '../../../queries/users';
+import users from '../../../entities/users';
 
 export const localAuthStrategy = new local.Strategy(
     {
@@ -9,7 +9,7 @@ export const localAuthStrategy = new local.Strategy(
     },
     async function(email, password, done): Promise<void> {
         try {
-            const user = await findUserByEmail(email);
+            const user = await users.findUserByEmail(email);
 
             // fail if user not confirmed
             if (!user.confirmed) return done(null, false);

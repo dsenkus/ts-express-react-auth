@@ -1,8 +1,8 @@
 import * as passport from 'passport';
 import Router from 'express-promise-router';
-import { insertUser, confirmUser, findUserByEmail, resetPasswordWithToken } from '../../queries/users';
+import users from '../../entities/users';
 import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
-import { userCreateSchema, userPasswordChangeSchema } from '../../validators/users';
+import { userCreateSchema, userPasswordChangeSchema } from '../../entities/users/validators';
 import { isAuthenticated } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
 import { sendPasswordResetEmail } from './mail/passwordResetEmail';
@@ -28,7 +28,7 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
     try {
-        await insertUser(req.body);
+        await users.insertUser(req.body);
     } catch(err) { }
     res.status(200).send();
 });
@@ -41,7 +41,7 @@ router.post('/confirm', async (req, res): Promise<void> => {
     const { token } = req.body;
 
     try {
-        await confirmUser(token);
+        await users.confirmUser(token);
     } catch (err) {
         throw new InvalidConfirmationTokenError();
     }
@@ -83,7 +83,7 @@ router.post('/reset_password', async (req, res): Promise<void> => {
     const { email } = req.body;
 
     try {
-        const user = await findUserByEmail(email);
+        const user = await users.findUserByEmail(email);
         sendPasswordResetEmail(user);
     } catch(err) {
         // ignore errors, always succeeds
@@ -106,7 +106,7 @@ router.post('/reset_password/:token', async (req, res): Promise<void> => {
     // parse token
     try {
         const tokenData = parseResetPasswordParam(token);
-        await resetPasswordWithToken(tokenData.id, tokenData.token, password);
+        await users.resetPasswordWithToken(tokenData.id, tokenData.token, password);
     } catch(err) {
         throw new InvalidPasswordResetTokenError();
     }

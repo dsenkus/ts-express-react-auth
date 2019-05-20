@@ -2,6 +2,28 @@ import * as config from 'config';
 import * as bcrypt from 'bcrypt';
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "./errors";
+import { QueryResult } from "pg";
+
+/**
+ * Returns first row from QueryResult or null.
+ * 
+ * @param promise node-postgres Promsie<QueryResult>
+ */
+export async function firstOrNull<T>(promise: Promise<QueryResult>): Promise<T | null> {
+    const result = await promise;
+    return result.rowCount > 0 ? result.rows[0] as T : null;
+}
+
+/**
+ * Returns first row from QueryResult or throws an error.
+ * 
+ * @param result node-postgres QueryResult
+ */
+export async function firstOrError<T>(promise: Promise<QueryResult>): Promise<T> {
+    const result = await promise;
+    if(result.rowCount < 1) throw new Error(`Query returned empty result set ${result.command}`);
+    return result.rows[0];
+}
 
 /**
  * Returns reset password link.
