@@ -5,11 +5,11 @@
   "main": "src/server.js",
   "scripts": {
     "start": "NODE_ENV=production npx pm2 start pm2.yaml",
+    "dev": "nodemon",
     "build": "tsc",
     "serve": "ts-node src/server.ts",
     "test": "NODE_ENV=test jest --runInBand",
     "test:watch": "npm run test -- --watch",
-    "start": "nodemon",
     "docker:db:start": "docker-compose up",
     "docker:db:reset": "docker-compose down && docker volume rm ts-auth_ts_auth && docker-compose build"
   },
