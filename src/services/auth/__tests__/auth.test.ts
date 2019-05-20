@@ -1,11 +1,11 @@
 import * as HttpStatus from 'http-status-codes';
 import * as faker from 'faker';
 import * as request from 'supertest';
-import app from '../../app';
-import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
-import { createUser, authenticateUser, buildUserData } from '../utils';
-import { isPasswordValid, generateResetPasswordParam } from '../../utils';
-import users from '../../entities/users';
+import app from '../../../app';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../../errors';
+import { createUser, authenticateUser, buildUserData } from '../../../../test/utils';
+import { isPasswordValid, generateResetPasswordParam } from '../../../utils';
+import users from '../../../entities/users';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {

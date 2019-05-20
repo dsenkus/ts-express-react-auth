@@ -1,7 +1,7 @@
 import * as request from 'supertest';
-import app from '../app';
+import app from '../src/app';
 import * as faker from 'faker';
-import users from '../entities/users';
+import users from '../src/entities/users';
 
 /**
  * Builds new user data.

@@ -1,7 +1,7 @@
 import * as redis from 'redis';
 import * as redisMock from 'redis-mock';
-import { dbClose, query } from '../db';
-import { redisStore } from '../redis';
+import { dbClose, query } from '../src/db';
+import { redisStore } from '../src/redis';
 
 // mock Redis
 jest.spyOn(redis, 'createClient').mockImplementation(redisMock.createClient);

@@ -1,8 +1,8 @@
 import * as faker from 'faker';
 import * as dateFns from 'date-fns';
-import { buildUserData, createUser } from '../utils';
-import users from '../../entities/users';
-import { isPasswordValid } from '../../utils';
+import { buildUserData, createUser } from '../../../../test/utils';
+import users from '..';
+import { isPasswordValid } from '../../../utils';
 
 describe("users queries", (): void => {
     describe("findUserByEmail", (): void => {

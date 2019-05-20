@@ -61,7 +61,7 @@
   },
   "jest": {
     "setupFilesAfterEnv": [
-      "<rootDir>/src/test/setupTests.ts"
+      "<rootDir>/test/setupTests.ts"
     ],
     "moduleFileExtensions": [
       "ts",
