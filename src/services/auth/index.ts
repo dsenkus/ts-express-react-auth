@@ -6,6 +6,7 @@ import { userCreateSchema, userPasswordChangeSchema } from '../../entities/users
 import { isAuthenticated } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
 import { sendPasswordResetEmail } from './mail/passwordResetEmail';
+import { logger } from '../../logger';
 
 const router = Router();
 
@@ -28,7 +29,8 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
     try {
-        await users.insertUser(req.body);
+        const user = await users.insertUser(req.body);
+        logger.log('info', `Registered user ${user.email}`);
     } catch(err) { }
     res.status(200).send();
 });
@@ -41,7 +43,8 @@ router.post('/confirm', async (req, res): Promise<void> => {
     const { token } = req.body;
 
     try {
-        await users.confirmUser(token);
+        const user = await users.confirmUser(token);
+        logger.log('info', `Confirmed user ${user.email}`);
     } catch (err) {
         throw new InvalidConfirmationTokenError();
     }
@@ -85,6 +88,7 @@ router.post('/reset_password', async (req, res): Promise<void> => {
     try {
         const user = await users.findUserByEmail(email);
         sendPasswordResetEmail(user);
+        logger.log('info', `Reset Password requested by ${user.email}`);
     } catch(err) {
         // ignore errors, always succeeds
     }
@@ -106,7 +110,8 @@ router.post('/reset_password/:token', async (req, res): Promise<void> => {
     // parse token
     try {
         const tokenData = parseResetPasswordParam(token);
-        await users.resetPasswordWithToken(tokenData.id, tokenData.token, password);
+        const user = await users.resetPasswordWithToken(tokenData.id, tokenData.token, password);
+        logger.log('info', `Password reseted by ${user.email}`);
     } catch(err) {
         throw new InvalidPasswordResetTokenError();
     }

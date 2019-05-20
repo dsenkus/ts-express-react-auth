@@ -9,6 +9,7 @@ import { buildErrorJson } from './utils/httpErrors';
 import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';
+import { logger } from './logger';
 
 const app = express();
 
@@ -54,18 +55,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // ----------------------------------------------------------------------------- 
 app.use('/auth', auth);
 
-// GLobal Error handler
+// Global Error handler
 // ----------------------------------------------------------------------------- 
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
     const error = buildErrorJson(err);
     if(!error.status || error.status === HttpStatus.INTERNAL_SERVER_ERROR) {
-        console.error(err);
+        logger.log('error', `Global Error Handler: ${err}`, { error: err })
     }
 
     res.status(error.status).json({ error });
 })
 
 // Application error logging.
-app.on('error', console.error);
+app.on('error', (error): void => {
+    logger.log('error', `Application Error Handler: ${error}`, { error });
+});
 
 export default app;

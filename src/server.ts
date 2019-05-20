@@ -1,16 +1,17 @@
 import * as config from 'config';
 import app from "./app";
+import { logger } from './logger';
 
-process.on("uncaughtException", (e): void => {
-    console.log(e);
+process.on("uncaughtException", (error): void => {
+    logger.log('error', `Uncaught Exception: ${error}`, { error })
     process.exit(1);
 });
   
-process.on("unhandledRejection", (e): void => {
-    console.log(e);
+process.on("unhandledRejection", (error): void => {
+    logger.log('error', `Unhandled Rejection: ${error}`, { error })
     process.exit(1);
 });
 
 export const server = app.listen(config.get('app.port'), (): void => {
-    console.log(`Server started on port ${config.get('app.port')}`);
+    logger.log('info', `Server started on port ${config.get('app.port')}`);
 });

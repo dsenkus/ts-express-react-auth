@@ -18,5 +18,10 @@
     "enabled": false,
     "sandbox": false,
     "apiKey": ""
+  },
+
+  "logger": {
+    "logToFile": false,
+    "logToConsole": false
   }
 }

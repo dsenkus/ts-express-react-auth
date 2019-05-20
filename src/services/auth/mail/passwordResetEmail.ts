@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { createPasswordResetLink } from '../../../utils';
 import { client } from '../../../sparkpost';
+import { logger } from '../../../logger';
 
 const buildEmail = (content: string): string => {
     const template = fs.readFileSync(__dirname + '/emailTemplate.html', 'utf8');
@@ -32,4 +33,6 @@ export const sendPasswordResetEmail = async (user: User): Promise<void> => {
             {address: user.email}
         ],
     });
+
+    logger.log('info', `SparkPost: Password Reset email sent to ${user.email}`);
 }

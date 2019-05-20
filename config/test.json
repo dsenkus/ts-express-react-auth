@@ -13,5 +13,10 @@
 
   "sparkpost": {
     "enabled": false
+  },
+
+  "logger": {
+    "logToFile": true,
+    "logToConsole": false
   }
 }
