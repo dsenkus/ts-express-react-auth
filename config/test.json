@@ -1,0 +1,17 @@
+{
+  "app": {
+    "port": 3000
+  },
+
+  "db": {
+    "uri": "postgres://root:root@localhost:5432/root"
+  },
+
+  "redis": {
+    "enabled": false
+  },
+
+  "sparkpost": {
+    "enabled": false
+  }
+}

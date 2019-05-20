@@ -1,0 +1,16 @@
+{
+  "db": {
+    "uri": "postgres://root:root@localhost:5432/root"
+  },
+
+  "redis": {
+    "enabled": true,
+    "uri": "//localhost:6379",
+    "secret": "shhhhh" 
+  },
+
+  "sparkpost": {
+    "enabled": true,
+    "apiKey": ""
+  }
+}

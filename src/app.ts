@@ -1,22 +1,14 @@
 import * as bodyParser from 'body-parser';
-import * as dotenv from 'dotenv';
+import * as config from 'config';
 import * as express from 'express';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
-import * as path from 'path';
 import authRoutes from './routes/auth';
 import { buildErrorJson } from './errors';
 import { localAuthStrategy } from './auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';
-
-// initialize env variables
-if(process.env.NODE_ENV !== 'production') {
-    dotenv.config({
-        path: path.resolve(process.cwd(), process.env.NODE_ENV === 'test' ? '.env.test' :'.env')
-    });
-}
 
 const app = express();
 
@@ -24,7 +16,10 @@ const app = express();
 // ----------------------------------------------------------------------------- 
 app.use(session({
     store: redisStore,
-    secret: process.env.REDIS_SECRET,
+    secret: config.get('redis.secret'),
+    cookie: {
+        // secure: true,
+    },
     resave: false,
     saveUninitialized: false
 }))
@@ -63,7 +58,7 @@ app.use('/auth', authRoutes);
 // ----------------------------------------------------------------------------- 
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
     const error = buildErrorJson(err);
-    if(error.status === HttpStatus.INTERNAL_SERVER_ERROR) {
+    if(!error.status || error.status === HttpStatus.INTERNAL_SERVER_ERROR) {
         console.error(err);
     }
 

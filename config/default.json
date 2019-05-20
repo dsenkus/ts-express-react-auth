@@ -1,0 +1,22 @@
+{
+  "app": {
+    "port": 3000,
+    "siteUrl": "/"
+  },
+
+  "db": {
+    "uri": ""
+  },
+
+  "redis": {
+    "enabled": false,
+    "uri": "",
+    "secret": "shhhhh" 
+  },
+
+  "sparkpost": {
+    "enabled": false,
+    "sandbox": false,
+    "apiKey": ""
+  }
+}
