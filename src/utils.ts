@@ -1,7 +1,7 @@
 import * as config from 'config';
 import * as bcrypt from 'bcrypt';
 import { Request, Response, NextFunction } from "express";
-import { UnauthorizedError } from "./errors";
+import { UnauthorizedError } from "./utils/httpErrors";
 import { QueryResult } from "pg";
 
 /**

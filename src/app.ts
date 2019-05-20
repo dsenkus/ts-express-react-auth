@@ -5,7 +5,7 @@ import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
 import auth from './services/auth';
-import { buildErrorJson } from './errors';
+import { buildErrorJson } from './utils/httpErrors';
 import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';

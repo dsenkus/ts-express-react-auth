@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import * as faker from 'faker';
 import * as request from 'supertest';
 import app from '../../../app';
-import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../../errors';
+import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../../utils/httpErrors';
 import { createUser, authenticateUser, buildUserData } from '../../../../test/utils';
 import { isPasswordValid, generateResetPasswordParam } from '../../../utils';
 import users from '../../../entities/users';

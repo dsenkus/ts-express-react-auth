@@ -1,7 +1,7 @@
 import * as passport from 'passport';
 import Router from 'express-promise-router';
 import users from '../../entities/users';
-import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
+import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../utils/httpErrors';
 import { userCreateSchema, userPasswordChangeSchema } from '../../entities/users/validators';
 import { isAuthenticated } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
