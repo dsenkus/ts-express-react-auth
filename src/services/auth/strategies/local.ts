@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import * as local from 'passport-local';
-import { findUserByEmail } from '../../queries/users';
+import { findUserByEmail } from '../../../queries/users';
 
 export const localAuthStrategy = new local.Strategy(
     {

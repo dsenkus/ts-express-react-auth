@@ -1,11 +1,11 @@
 import * as passport from 'passport';
 import Router from 'express-promise-router';
-import { insertUser, confirmUser, findUserByEmail, resetPasswordWithToken } from '../queries/users';
-import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../errors';
-import { userCreateSchema, userPasswordChangeSchema } from '../validators/users';
-import { isAuthenticated } from '../utils';
-import { parseResetPasswordParam } from '../utils';
-import { sendPasswordResetEmail } from '../mail/passwordResetEmail';
+import { insertUser, confirmUser, findUserByEmail, resetPasswordWithToken } from '../../queries/users';
+import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../errors';
+import { userCreateSchema, userPasswordChangeSchema } from '../../validators/users';
+import { isAuthenticated } from '../../utils';
+import { parseResetPasswordParam } from '../../utils';
+import { sendPasswordResetEmail } from '../../mail/passwordResetEmail';
 
 const router = Router();
 

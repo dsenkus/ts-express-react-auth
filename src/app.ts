@@ -4,9 +4,9 @@ import * as express from 'express';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
-import authRoutes from './routes/auth';
+import auth from './services/auth';
 import { buildErrorJson } from './errors';
-import { localAuthStrategy } from './auth/strategies/local';
+import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';
 
@@ -52,7 +52,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 // ----------------------------------------------------------------------------- 
-app.use('/auth', authRoutes);
+app.use('/auth', auth);
 
 // GLobal Error handler
 // ----------------------------------------------------------------------------- 
