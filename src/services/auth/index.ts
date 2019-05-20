@@ -5,7 +5,7 @@ import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPass
 import { userCreateSchema, userPasswordChangeSchema } from '../../validators/users';
 import { isAuthenticated } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
-import { sendPasswordResetEmail } from '../../mail/passwordResetEmail';
+import { sendPasswordResetEmail } from './mail/passwordResetEmail';
 
 const router = Router();
 
