@@ -11,16 +11,16 @@ describe("users queries", (): void => {
             const user = await insertUser(data);
             await insertUser(buildUserData());
 
-            const result = await findUserByEmail(data.email);
+            const result = await findUserByEmail(data.email) as User;
 
             expect(result.email).toEqual(user.email);
             expect(result.name).toEqual(user.name);
             expect(result.confirmed).toEqual(user.confirmed);
         });
 
-        it("should return null when user not found", async (): Promise<void> => {
-            const result = await findUserByEmail('wrong@email.com');
-            expect(result).toBeNull();
+        it("should throw error when user not found", async (): Promise<void> => {
+            const result = findUserByEmail('wrong@email.com');
+            await expect(result).rejects.toThrowError(/empty result/);
         });
     });
 
@@ -58,9 +58,9 @@ describe("users queries", (): void => {
             expect(confirmedUser.confirmed).toEqual(true);
         });
 
-        it("should return null when token invalid", async (): Promise<void> => {
-            const confirmedUser = await confirmUser('invalidtoken');
-            expect(confirmedUser).toEqual(null);
+        it("should throw werror when token invalid", async (): Promise<void> => {
+            const confirmedUser = confirmUser('invalidtoken');
+            await expect(confirmedUser).rejects.toThrowError(/empty result/);
         });
     });
 
@@ -75,16 +75,16 @@ describe("users queries", (): void => {
             expect(dateFns.differenceInMilliseconds(new Date(), result.reset_password_created_at)).toBeLessThan(100);
         });
 
-        it("should return null when user id invalid", async (): Promise<void> => {
-            const confirmedUser = await generateResetPasswordToken(faker.random.uuid());
-            expect(confirmedUser).toEqual(null);
+        it("should throw error when user id invalid", async (): Promise<void> => {
+            const confirmedUser = generateResetPasswordToken(faker.random.uuid());
+            await expect(confirmedUser).rejects.toThrowError(/empty result/);
         });
     });
 
     describe("resetPasswordWithToken", (): void => {
         it("should change password and generate new token", async (): Promise<void> => {
             const user = await createUser();
-            const result = await resetPasswordWithToken(user.id, user.reset_password_token, 'newpassword');
+            const result = await resetPasswordWithToken(user.id, user.reset_password_token, 'newpassword') as User;
 
             expect(result.reset_password_token).not.toEqual(user.reset_password_token);
             expect(result.reset_password_created_at).not.toEqual(user.reset_password_created_at);
@@ -94,13 +94,10 @@ describe("users queries", (): void => {
             expect (passwordValid).toBeTruthy();
         });
 
-        it("should return null if user id/reset_password_token is wrong", async (): Promise<void> => {
-            const result = await resetPasswordWithToken(
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 
-                'newpassword');
-
-            expect(result).toBeNull();
+        it("should throw error if user id/reset_password_token is incorrect", async (): Promise<void> => {
+            const user = await createUser();
+            const result = resetPasswordWithToken(user.id, 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'newpassword');
+            await expect(result).rejects.toThrowError(/empty result/);
         });
     });
 });

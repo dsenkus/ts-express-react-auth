@@ -8,20 +8,20 @@ export const localAuthStrategy = new local.Strategy(
         passwordField : 'password'
     },
     async function(email, password, done): Promise<void> {
-        const user = await findUserByEmail(email);
+        try {
+            const user = await findUserByEmail(email);
 
-        // fail if user not found or user is not confirmed
-        if (!user || !user.confirmed) {
+            // fail if user not confirmed
+            if (!user.confirmed) return done(null, false);
+
+            // fail if password does not match
+            const passwordValid = await bcrypt.compare(password, user.password);
+            if (!passwordValid) return done(null, false);
+
+            // success
+            done(null, user);
+        } catch (err) {
             return done(null, false);
         }
-
-        // fail if password does not match
-        const passwordValid = await bcrypt.compare(password, user.password);
-        if (!passwordValid) {
-            return done(null, false);
-        }
-
-        // success
-        done(null, user);
     }
 );

@@ -27,7 +27,9 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
-    await insertUser(req.body);
+    try {
+        await insertUser(req.body);
+    } catch(err) { }
     res.status(200).send();
 });
 
@@ -38,8 +40,11 @@ router.post('/register', async (req, res): Promise<void> => {
 router.post('/confirm', async (req, res): Promise<void> => {
     const { token } = req.body;
 
-    const user = await confirmUser(token);
-    if(!user) throw new InvalidConfirmationTokenError();
+    try {
+        await confirmUser(token);
+    } catch (err) {
+        throw new InvalidConfirmationTokenError();
+    }
 
     res.status(200).send();
 });
@@ -77,8 +82,12 @@ router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
 router.post('/reset_password', async (req, res): Promise<void> => {
     const { email } = req.body;
 
-    const user = await findUserByEmail(email);
-    if(user) sendPasswordResetEmail(user);
+    try {
+        const user = await findUserByEmail(email);
+        sendPasswordResetEmail(user);
+    } catch(err) {
+        // ignore errors, always succeeds
+    }
 
     res.status(200).send();
 });
@@ -91,16 +100,16 @@ router.post('/reset_password/:token', async (req, res): Promise<void> => {
     const { password } = req.body;
     const { token } = req.params;
 
-    // parse token
-    const tokenData = parseResetPasswordParam(token);
-    if(!tokenData) throw new InvalidPasswordResetTokenError();
-
     // validate password
     await userPasswordChangeSchema.validate(req.body, { abortEarly: false });
 
-    // update password
-    const user = await resetPasswordWithToken(tokenData.id, tokenData.token, password);
-    if(!user) throw new InvalidPasswordResetTokenError();
+    // parse token
+    try {
+        const tokenData = parseResetPasswordParam(token);
+        await resetPasswordWithToken(tokenData.id, tokenData.token, password);
+    } catch(err) {
+        throw new InvalidPasswordResetTokenError();
+    }
 
     res.status(200).send();
 });

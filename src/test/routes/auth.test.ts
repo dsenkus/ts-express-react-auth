@@ -89,7 +89,7 @@ describe("POST /auth/register", (): void => {
             .post('/auth/register')
             .send({ name, email, password });
 
-        const user = await findUserByEmail(email);
+        const user = await findUserByEmail(email) as User;
         expect(result.status).toEqual(HttpStatus.OK);
         expect(user.email).toEqual(email);
         expect(user.name).toEqual(name);
@@ -167,7 +167,7 @@ describe("POST /auth/confirm", (): void => {
 
         expect(result.status).toEqual(HttpStatus.OK);
 
-        const confirmedUser = await findUserByEmail(user.email);
+        const confirmedUser = await findUserByEmail(user.email) as User;
         expect(confirmedUser.email).toEqual(user.email);
         expect(confirmedUser.confirmed).toBeTruthy();
     });
@@ -204,7 +204,7 @@ describe("POST /auth/reset_password", (): void => {
             .post(`/auth/reset_password/${token}`)
             .send({ password: newPassword });
 
-        const updatedUser = await findUserByEmail(user.email);
+        const updatedUser = await findUserByEmail(user.email) as User;
 
         expect(result.status).toEqual(HttpStatus.OK);
         expect(updatedUser.password).not.toEqual(user.password);
@@ -226,7 +226,7 @@ describe("POST /auth/reset_password", (): void => {
         expect(result.body.error.data.password).toMatch(/must be at least/);
 
         // check if password has not changed
-        const updatedUser = await findUserByEmail(user.email);
+        const updatedUser = await findUserByEmail(user.email) as User;
         const passwordValid = await isPasswordValid(user.password, updatedUser.password);
         expect(passwordValid).toBeTruthy();
     });
@@ -244,7 +244,7 @@ describe("POST /auth/reset_password", (): void => {
         });
 
         // check if password has not changed
-        const updatedUser = await findUserByEmail(email);
+        const updatedUser = await findUserByEmail(email) as User;
         const passwordValid = await isPasswordValid(password, updatedUser.password);
         expect(passwordValid).toBeTruthy();
     });

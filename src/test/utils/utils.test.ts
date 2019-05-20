@@ -18,9 +18,9 @@ describe("parseResetPasswordParam", (): void => {
         });
     });
 
-    it("should return null if invalid format param is provided", async (): Promise<void> => {
+    it("should throw error if invalid format param is provided", async (): Promise<void> => {
         const user = await createUser();
         const param = generateResetPasswordParam(user) + '!';
-        expect(parseResetPasswordParam(param)).toBeNull();
+        expect((): void => { parseResetPasswordParam(param) }).toThrow();
     });
 });

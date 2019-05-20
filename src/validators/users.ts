@@ -8,8 +8,12 @@ const userEmailValidator = yup.string().required().email().max(256).test({
     message: 'email already taken',
     test: async (email: string): Promise<boolean> => {
         // check if email already taken
-        const user = await findUserByEmail(email);
-        return !Boolean(user);
+        try {
+            await findUserByEmail(email);
+            return false;
+        } catch(err) {
+            return true;
+        }
     }
 });
 
