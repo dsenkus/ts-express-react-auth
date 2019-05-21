@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "./utils/httpErrors";
 import { QueryResult } from "pg";
+import { DbError } from './db';
 
 /**
  * Returns first row from QueryResult or null.
@@ -21,7 +22,7 @@ export async function firstOrNull<T>(promise: Promise<QueryResult>): Promise<T |
  */
 export async function firstOrError<T>(promise: Promise<QueryResult>): Promise<T> {
     const result = await promise;
-    if(result.rowCount < 1) throw new Error(`Query returned empty result set ${result.command}`);
+    if(result.rowCount < 1) throw new DbError(`Query returned empty result set (${result.command})`);
     return result.rows[0];
 }
 

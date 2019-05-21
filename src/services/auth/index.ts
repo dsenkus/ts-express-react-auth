@@ -28,10 +28,8 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
-    try {
-        const user = await users.insertUser(req.body);
-        logger.log('info', `Registered user ${user.email}`);
-    } catch(err) { }
+    const user = await users.insertUser(req.body);
+    logger.log('info', `Registered user ${user.email}`);
     res.status(200).send();
 });
 

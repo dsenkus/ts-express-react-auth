@@ -10,6 +10,7 @@ import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';
 import { logger } from './logger';
+import { DbError } from './db';
 
 const app = express();
 
@@ -59,7 +60,10 @@ app.use('/auth', auth);
 // ----------------------------------------------------------------------------- 
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
     const error = buildErrorJson(err);
-    if(!error.status || error.status === HttpStatus.INTERNAL_SERVER_ERROR) {
+
+    if(err instanceof DbError) {
+        logger.log('warn', `DbError: ${err}`, { error: err })
+    } else if(!error.status || error.status === HttpStatus.INTERNAL_SERVER_ERROR) {
         logger.log('error', `Global Error Handler: ${err}`, { error: err })
     }
 
