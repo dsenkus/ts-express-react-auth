@@ -57,16 +57,18 @@ export class InvalidConfirmationTokenError extends ApplicationError {
 /**
  * Get default app error.
  */
-const getDefaultError = (): JsonError => ({
-    type: 'InternalServerError',
-    message: 'Internal Server Error',
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-});
+function getDefaultError(): JsonError {
+    return {
+        type: 'InternalServerError',
+        message: 'Internal Server Error',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+    }
+}
 
 /**
  * Builds ValidationError from `Yup` error. 
  */
-const getValidationError = (error: YupValidationError): JsonError => {
+function getValidationError(error: YupValidationError): JsonError {
     return {
         type: 'ValidationError',
         message: error.message,
@@ -81,7 +83,7 @@ const getValidationError = (error: YupValidationError): JsonError => {
 /**
  * Builds error in JSON format. 
  */
-export const buildErrorJson = (error: any): JsonError => {
+export function buildErrorJson(error: any): JsonError {
     // check for Yup validation errors
     if(error instanceof YupValidationError) return getValidationError(error);
 

@@ -28,13 +28,14 @@ export class DbError extends Error {
     }    
 }
 
-export const query = (text: string, values?: any[]): Promise<QueryResult> => {
+export function query(text: string, values?: any[]): Promise<QueryResult> {
     return pool.query(text, values)
         .catch((err): Promise<any> => {
             throw new DbError(err, text, values);
         })
 }
-export const dbClose = (): void => { 
+
+export function dbClose(): void { 
     pool.end();
     logger.log('info', 'Database connection closed');
 }

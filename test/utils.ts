@@ -6,17 +6,19 @@ import users from '../src/entities/users';
 /**
  * Builds new user data.
  */
-export const buildUserData = (data: UserCreateDataOptional = {}): UserCreateData => ({
-    email: faker.internet.email(),
-    name: `${faker.name.findName()} ${faker.name.lastName()}`,
-    password: faker.random.alphaNumeric(8),
-    ...data,
-});
+export function buildUserData(data: UserCreateDataOptional = {}): UserCreateData {
+    return {
+        email: faker.internet.email(),
+        name: `${faker.name.findName()} ${faker.name.lastName()}`,
+        password: faker.random.alphaNumeric(8),
+        ...data,
+    };
+}
 
 /**
  * Creates new confirmed user and adds it to database.
  */
-export const createUser = async (): Promise<User> => {
+export async function createUser(): Promise<User> {
     const data = buildUserData();
     const user = await users.insertUser(data);
     await users.confirmUser(user.confirm_token);
@@ -26,10 +28,11 @@ export const createUser = async (): Promise<User> => {
         password: data.password
     };
 }
+
 /**
  * Authenticates `user` and returns session id.
  */
-export const authenticateUser = async (user: User): Promise<string> => {
+export async function authenticateUser(user: User): Promise<string> {
     const authenticate = await request(app)
         .post('/auth/login')
         .send({ email: user.email, password: user.password });

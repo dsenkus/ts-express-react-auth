@@ -3,7 +3,7 @@ import { createPasswordResetLink } from '../../../utils';
 import { client } from '../../../sparkpost';
 import { logger } from '../../../logger';
 
-const buildEmail = (content: string): string => {
+function buildEmail(content: string): string {
     const template = fs.readFileSync(__dirname + '/emailTemplate.html', 'utf8');
     return template
         .replace('!!!PLACEHOLDER_TITLE!!!', 'Password Reset')
@@ -12,7 +12,7 @@ const buildEmail = (content: string): string => {
         .replace('!!!PLACEHOLDER_YEAR!!!', (new Date()).getFullYear().toString())
 };
 
-export const sendPasswordResetEmail = async (user: User): Promise<void> => {
+export async function sendPasswordResetEmail(user: User): Promise<void> {
     if(!client) return;
     const resetLink = createPasswordResetLink(user.reset_password_token)
 

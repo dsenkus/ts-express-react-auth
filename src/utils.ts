@@ -36,7 +36,7 @@ export const createPasswordResetLink = (token: string): string => (
 /**
  * Validates user password.
  */
-export const isPasswordValid = async (password: string, encryptedPassword: string): Promise<boolean> => {
+export async function isPasswordValid(password: string, encryptedPassword: string): Promise<boolean> {
     return await bcrypt.compare(password, encryptedPassword);
 }
 
@@ -45,14 +45,12 @@ export const isPasswordValid = async (password: string, encryptedPassword: strin
  * 
  * The param will consist of 32 character reset password token followed by user id
  */
-export const generateResetPasswordParam = (user: User): string => {
-    return `${user.reset_password_token}${user.id}`;
-}
+export const generateResetPasswordParam = (user: User): string => (`${user.reset_password_token}${user.id}`);
 
 /**
  * Parses password reset endpoint parameter into user.id and user.reset_password_token.
  */
-export const parseResetPasswordParam = (param: string): { id: string; token: string } => {
+export function parseResetPasswordParam(param: string): { id: string; token: string } {
     if(param.length !== 68) throw new Error('Invalid reset password param');
 
     return {
@@ -64,7 +62,7 @@ export const parseResetPasswordParam = (param: string): { id: string; token: str
 /**
  * Middleware, checks if current user is authenticated.
  */
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction): any => {
+export function isAuthenticated(req: Request, res: Response, next: NextFunction): any {
     if(req.user) return next();
 
     return next(new UnauthorizedError());
@@ -73,4 +71,6 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 /**
  * Returns encrypted password.
  */
-export const encryptPassword = (password: string): Promise<string> => bcrypt.hash(password, 10);
+export function encryptPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+}
