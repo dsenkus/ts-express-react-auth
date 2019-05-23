@@ -17,9 +17,11 @@ const router = Router();
 router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
     const user = req.user;
 
-    res.send({
-        ...user
-    });
+    const response: AuthWhoamiResponse = {
+        success: true,
+        user: users.serializeAuthUser(user)
+    };
+    res.json(response);
 });
 
 // -----------------------------------------------------------------------------
@@ -30,7 +32,9 @@ router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
     const user = await users.insertUser(req.body);
     logger.log('info', `Registered user ${user.email}`);
-    res.status(200).send();
+
+    const response: AuthRegisterResponse = { success: true };
+    res.status(201).json(response);
 });
 
 // -----------------------------------------------------------------------------
@@ -47,7 +51,8 @@ router.post('/confirm', async (req, res): Promise<void> => {
         throw new InvalidConfirmationTokenError();
     }
 
-    res.status(200).send();
+    const response: AuthConfirmResponse = { success: true };
+    res.json(response);
 });
 
 // -----------------------------------------------------------------------------
@@ -61,7 +66,11 @@ router.post('/login', (req, res, next): any => {
         // create user session
         req.logIn(user, (err): any => {
             if (err) return next(err);
-            res.status(200).send();
+            const response: AuthLoginResponse = { 
+                success: true,
+                user: users.serializeAuthUser(user)
+            };
+            res.json(response);
         });
 
     })(req, res, next);
@@ -73,7 +82,8 @@ router.post('/login', (req, res, next): any => {
 
 router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
     req.logOut();
-    res.status(200).send();
+    const response: AuthLogoutResponse = { success: true };
+    res.json(response);
 });
 
 // -----------------------------------------------------------------------------
@@ -88,10 +98,11 @@ router.post('/reset_password', async (req, res): Promise<void> => {
         sendPasswordResetEmail(user);
         logger.log('info', `Reset Password requested by ${user.email}`);
     } catch(err) {
-        // ignore errors, always succeeds
+        // ignore errors, so action always succeeds. Prevents email fishing.
     }
 
-    res.status(200).send();
+    const response: AuthResetPasswordResponse = { success: true };
+    res.json(response);
 });
 
 // -----------------------------------------------------------------------------
@@ -114,7 +125,8 @@ router.post('/reset_password/:token', async (req, res): Promise<void> => {
         throw new InvalidPasswordResetTokenError();
     }
 
-    res.status(200).send();
+    const response: AuthResetPasswordResponse = { success: true };
+    res.json(response);
 });
 
 export default router;

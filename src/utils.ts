@@ -6,6 +6,22 @@ import { QueryResult } from "pg";
 import { DbError } from './db';
 
 /**
+ * Creates an object composed of the picked `object` properties
+ * Throws an error if property is undefined.
+ * 
+ * @param object The source object.
+ * @param props The properties to pick. 
+ */
+export function pick<T extends object, U extends keyof T>(object: T, props: U[]): Pick<T, U> {
+    return props.reduce((acc, prop): any => {
+        if(typeof object[prop] === 'undefined') {
+            throw new Error(`Pick: '${prop}' is undefined in ${JSON.stringify(object)}`);
+        }
+        return { ...acc, [prop]: object[prop]}
+    }, {});
+}
+
+/**
  * Returns first row from QueryResult or null.
  * 
  * @param promise node-postgres Promsie<QueryResult>

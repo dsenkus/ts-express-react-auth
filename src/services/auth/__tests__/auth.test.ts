@@ -24,7 +24,7 @@ describe("GET /auth/whoami", (): void => {
             .get('/auth/whoami')
             .set('Cookie', [cookie])
 
-        expect(result.body.name).toEqual(user.name)
+        expect(result.body.user).toEqual(users.serializeAuthUser(user));
         expect(result.status).toEqual(HttpStatus.OK);
     });
 });
@@ -68,14 +68,16 @@ describe("POST /auth/login", (): void => {
         });
     });
 
-    it("it should set HttpOnly session cookie when success", async (): Promise<void> => {
-        const { email, password } = await createUser();
+    it("it should set HttpOnly session cookie and respond with user data when success", async (): Promise<void> => {
+        const user = await createUser();
+        const { email, password } = user;
 
         const result = await request(app)
             .post('/auth/login')
             .send({ email, password });
 
         expect(result.status).toEqual(HttpStatus.OK);
+        expect(result.body.user).toEqual(users.serializeAuthUser(user));
         expect(result.header['set-cookie'][0]).toMatch(/connect\.sid/);
         expect(result.header['set-cookie'][0]).toMatch(/HttpOnly/);
     });
@@ -90,7 +92,7 @@ describe("POST /auth/register", (): void => {
             .send({ name, email, password });
 
         const user = await users.findUserByEmail(email) as User;
-        expect(result.status).toEqual(HttpStatus.OK);
+        expect(result.status).toEqual(HttpStatus.CREATED);
         expect(user.email).toEqual(email);
         expect(user.name).toEqual(name);
         expect(user.confirmed).toBeFalsy();

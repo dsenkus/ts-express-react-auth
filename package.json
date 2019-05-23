@@ -82,6 +82,9 @@
     },
     "testMatch": [
       "**/?(*.)+(spec|test).ts?(x)"
+    ],
+    "testPathIgnorePatterns": [
+      "./client"
     ]
   },
   "dependencies": {
