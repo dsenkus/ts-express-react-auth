@@ -1,5 +1,6 @@
 import * as HttpStatus from 'http-status-codes';
 import { ValidationError as YupValidationError } from 'yup';
+import { JsonError } from '../../types/common';
 
 /**
  * Base class for all errors.

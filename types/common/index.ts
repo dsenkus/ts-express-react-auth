@@ -4,8 +4,12 @@ export type UserAuthData = Pick<User, 'id' | 'email' | 'name'>
 export type UserCreateData = Pick<User, 'email' | 'password' | 'name'>
 export type UserCreateDataOptional = Partial<UserCreateData>
 
+export type JsonErrorTypes = 'ApplicationError' | 'InternalServerError' | 'InvalidAuthCredentialsError' |
+'InvalidAuthTokenError' | 'InvalidPasswordResetTokenError' | 'UnauthorizedError' | 'InvalidConfirmationTokenError' |
+'ValidationError';
+
 export interface JsonError {
-    type: string;
+    type: JsonErrorTypes;
     status: number;
     message: string;
     data?: any;
