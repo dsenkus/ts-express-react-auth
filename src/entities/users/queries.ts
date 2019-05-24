@@ -1,5 +1,7 @@
 import { query } from "../../db";
 import { encryptPassword, firstOrError } from "../../utils";
+import { User } from "../../../types/database";
+import { UserCreateData } from "../../../types/common";
 
 export async function findUserByEmail(email: string): Promise<User> {
     const sql = 'SELECT * FROM users WHERE email = $1';

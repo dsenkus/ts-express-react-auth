@@ -6,6 +6,7 @@ import { buildErrorJson, InvalidAuthCredentialsError, UnauthorizedError, Invalid
 import { createUser, authenticateUser, buildUserData } from '../../../../test/utils';
 import { isPasswordValid, generateResetPasswordParam } from '../../../utils';
 import users from '../../../entities/users';
+import { User } from '../../../../types/database';
 
 describe("GET /auth/whoami", (): void => {
     it("should fail for unauthenticated users", async (): Promise<void> => {

@@ -7,6 +7,7 @@ import { isAuthenticated } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
 import { sendPasswordResetEmail } from './mail/passwordResetEmail';
 import { logger } from '../../logger';
+import { AuthWhoamiResponse, AuthRegisterResponse, AuthConfirmResponse, AuthLoginResponse, AuthLogoutResponse, AuthResetPasswordResponse } from '../../../types/common';
 
 const router = Router();
 

@@ -3,6 +3,7 @@ import * as dateFns from 'date-fns';
 import { buildUserData, createUser } from '../../../../test/utils';
 import users from '..';
 import { isPasswordValid } from '../../../utils';
+import { User } from '../../../../types/database';
 
 describe("users queries", (): void => {
     describe("findUserByEmail", (): void => {
