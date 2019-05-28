@@ -11,6 +11,7 @@ import { NextFunction, Request, Response } from 'express';
 import { redisStore } from './redis';
 import { logger } from './logger';
 import { DbError } from './db';
+import { User } from '../types/database';
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(session({
     store: redisStore,
     secret: config.get('redis.secret'),
     cookie: {
-        // secure: true,
+        secure: config.get('app.secureCookie'),
     },
     resave: false,
     saveUninitialized: false

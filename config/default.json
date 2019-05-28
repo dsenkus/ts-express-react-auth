@@ -1,7 +1,8 @@
 {
   "app": {
     "port": 8000,
-    "siteUrl": "/"
+    "siteUrl": "/",
+    "secureCookie": false
   },
 
   "db": {

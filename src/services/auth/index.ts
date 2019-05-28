@@ -61,16 +61,21 @@ router.post('/confirm', async (req, res): Promise<void> => {
 // -----------------------------------------------------------------------------
 
 router.post('/login', (req, res, next): any => {
-    passport.authenticate('login', (err, user, info): any => {
+    passport.authenticate('login', { }, (err, user, info): any => {
         if(err || !user) return next(new InvalidAuthCredentialsError());
 
         // create user session
-        req.logIn(user, (err): any => {
+        req.logIn(user, { }, (err): any => {
             if (err) return next(err);
             const response: AuthLoginResponse = { 
                 success: true,
                 user: users.serializeAuthUser(user)
             };
+
+            if(req.body.rememberMe === true && req.session) {
+                req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
+            }
+
             res.json(response);
         });
 

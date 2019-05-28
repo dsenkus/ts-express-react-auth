@@ -81,6 +81,22 @@ describe("POST /auth/login", (): void => {
         expect(result.body.user).toEqual(users.serializeAuthUser(user));
         expect(result.header['set-cookie'][0]).toMatch(/connect\.sid/);
         expect(result.header['set-cookie'][0]).toMatch(/HttpOnly/);
+        expect(result.header['set-cookie'][0]).not.toMatch(/Expires=/);
+    });
+
+    it("it set cookie expiration date when rememberMe parameter is set", async (): Promise<void> => {
+        const user = await createUser();
+        const { email, password } = user;
+
+        const result = await request(app)
+            .post('/auth/login')
+            .send({ email, password, rememberMe: true });
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        expect(result.body.user).toEqual(users.serializeAuthUser(user));
+        expect(result.header['set-cookie'][0]).toMatch(/connect\.sid/);
+        expect(result.header['set-cookie'][0]).toMatch(/HttpOnly/);
+        expect(result.header['set-cookie'][0]).toMatch(/Expires=/);
     });
 });
 
