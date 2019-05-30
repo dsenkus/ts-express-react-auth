@@ -68,7 +68,7 @@ describe("users queries", (): void => {
     describe("generateResetPasswordToken", (): void => {
         it("should generate new token and set it's creation date", async (): Promise<void> => {
             const user = await createUser();
-            const result = await users.generateResetPasswordToken(user.id);
+            const result = await users.generateResetPasswordToken(user.email);
 
             expect(result.reset_password_token).not.toEqual(user.reset_password_token);
             expect(result.reset_password_created_at).not.toEqual(user.reset_password_created_at);

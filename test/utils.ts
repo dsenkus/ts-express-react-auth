@@ -2,6 +2,8 @@ import * as request from 'supertest';
 import app from '../src/app';
 import * as faker from 'faker';
 import users from '../src/entities/users';
+import { UserCreateDataOptional, UserCreateData } from '../types/common';
+import { User } from '../types/database';
 
 /**
  * Builds new user data.

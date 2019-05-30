@@ -19,12 +19,12 @@ export async function confirmUser(token: string): Promise<User> {
     return firstOrError<User>(query(sql, [token]));
 }
 
-export async function generateResetPasswordToken(id: string): Promise<User> {
+export async function generateResetPasswordToken(email: string): Promise<User> {
     const sql = `UPDATE users SET 
         reset_password_token = md5(random()::text),
         reset_password_created_at = current_timestamp
-        WHERE id = $1 RETURNING *`;
-    return firstOrError<User>(query(sql, [id]));
+        WHERE email = $1 RETURNING *`;
+    return firstOrError<User>(query(sql, [email]));
 }
 
 export async function resetPasswordWithToken(id: string, token: string, password: string): Promise<User> {

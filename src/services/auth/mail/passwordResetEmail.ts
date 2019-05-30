@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { createPasswordResetLink } from '../../../utils';
 import { client } from '../../../sparkpost';
 import { logger } from '../../../logger';
+import { User } from '../../../../types/database';
 
 function buildEmail(content: string): string {
     const template = fs.readFileSync(__dirname + '/emailTemplate.html', 'utf8');

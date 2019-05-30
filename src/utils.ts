@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "./utils/httpErrors";
 import { QueryResult } from "pg";
 import { DbError } from './db';
+import { User } from '../types/database';
 
 /**
  * Creates an object composed of the picked `object` properties

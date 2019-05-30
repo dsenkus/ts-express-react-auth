@@ -4,6 +4,7 @@ import * as express from 'express';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
+import * as cors from 'cors';
 import auth from './services/auth';
 import { buildErrorJson } from './utils/httpErrors';
 import { localAuthStrategy } from './services/auth/strategies/local';
@@ -52,6 +53,11 @@ passport.deserializeUser((user: User, done): void => {
 // ----------------------------------------------------------------------------- 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Cors
+// ----------------------------------------------------------------------------- 
+// TODO: disable in production
+app.use(cors());
 
 // Routes
 // ----------------------------------------------------------------------------- 

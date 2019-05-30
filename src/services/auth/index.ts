@@ -32,7 +32,7 @@ router.get('/whoami', isAuthenticated, async (req, res): Promise<void> => {
 router.post('/register', async (req, res): Promise<void> => {
     await userCreateSchema.validate(req.body, { abortEarly: false });
     const user = await users.insertUser(req.body);
-    logger.log('info', `Registered user ${user.email}`);
+    logger.log('info', `Registered user ${user.email} (confirmation token: ${user.confirm_token})`);
 
     const response: AuthRegisterResponse = { success: true };
     res.status(201).json(response);
@@ -100,10 +100,11 @@ router.post('/reset_password', async (req, res): Promise<void> => {
     const { email } = req.body;
 
     try {
-        const user = await users.findUserByEmail(email);
+        const user = await users.generateResetPasswordToken(email);
+        logger.log('info', `Reset Password requested by ${user.email} (reset token: ${user.reset_password_token})`);
         sendPasswordResetEmail(user);
-        logger.log('info', `Reset Password requested by ${user.email}`);
     } catch(err) {
+        logger.log('error', err);
         // ignore errors, so action always succeeds. Prevents email fishing.
     }
 
