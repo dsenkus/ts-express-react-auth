@@ -1,9 +1,10 @@
 import * as passport from 'passport';
+import * as config from 'config';
 import Router from 'express-promise-router';
 import users from '../../entities/users';
 import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../utils/httpErrors';
 import { userCreateSchema, userPasswordChangeSchema } from '../../entities/users/validators';
-import { isAuthenticated } from '../../utils';
+import { isAuthenticated, generateResetPasswordParam } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
 import { sendPasswordResetEmail } from './mail/passwordResetEmail';
 import { logger } from '../../logger';
@@ -101,10 +102,10 @@ router.post('/reset_password', async (req, res): Promise<void> => {
 
     try {
         const user = await users.generateResetPasswordToken(email);
-        logger.log('info', `Reset Password requested by ${user.email} (reset token: ${user.reset_password_token})`);
-        sendPasswordResetEmail(user);
+        const token = generateResetPasswordParam(user);
+        logger.log('info', `Reset Password requested by ${user.email} (reset token: ${token})`);
+        if(config.get('app.sendMail')) sendPasswordResetEmail(user, token);
     } catch(err) {
-        logger.log('error', err);
         // ignore errors, so action always succeeds. Prevents email fishing.
     }
 

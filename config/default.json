@@ -2,7 +2,8 @@
   "app": {
     "port": 8000,
     "siteUrl": "/",
-    "secureCookie": false
+    "secureCookie": false,
+    "sendMail": false
   },
 
   "db": {

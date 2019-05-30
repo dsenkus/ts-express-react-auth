@@ -25,6 +25,8 @@ export class DbError extends Error {
 
         if(query) this.query = query;
         if(values) this.values = values;
+
+        logger.log('error', 'DbError', { error: err, query, values });
     }    
 }
 

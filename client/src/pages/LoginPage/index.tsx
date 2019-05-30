@@ -6,18 +6,20 @@ import { Spinner } from '@blueprintjs/core';
 import { StoreContext } from '../../storePovider';
 
 const LoginPage = () => {
-  const { match } = useReactRouter();
+  const { match, history } = useReactRouter();
   const { token } = match.params as any;
   const { app } = useContext(StoreContext);
   const [confirmationLoading, setConfirmationLoading] = useState(false);
+  console.log(token);
 
   const submitConfirmation = async (token: string) => {
     setConfirmationLoading(true);
     try {
       await app.auth.confirm(token);
     } catch (err) {
-
+      // ignore errors
     } finally {
+      history.push('/');
       setConfirmationLoading(false);
     }
   }

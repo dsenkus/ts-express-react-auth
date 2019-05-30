@@ -5,42 +5,29 @@ import { StoreContext } from '../../storePovider';
 import { observer } from 'mobx-react-lite';
 import { isValidationError } from '../../utils/errorHandler';
 import { JsonError } from '../../../../types/common';
+import { useForm } from '../../utils/useForm';
 
-interface IPasswordResetFormStep2 {
+interface Props {
   token: string
 }
 
-const PasswordResetFormStep2: FunctionComponent<IPasswordResetFormStep2> = observer(({ token }) => {
+const PasswordResetFormStep2: FunctionComponent<Props> = observer(({ token }) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<JsonError | null>(null);
   const { history } = useReactRouter();
   const { app } = useContext(StoreContext);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setLoading(true);
-
-    try {
-      if(await app.auth.resetPassword(token, password)) {
-        setError(null);
-        // go to login page and show notification
-        history.push('/');
-      }
-    } catch (e) {
-      if(isValidationError(e)) {
-        setError(e.response.data);
-      }
-    }
-    setLoading(false);
-  }
+  const { loading, error, submitHandler } = useForm(async () => {
+      await app.auth.resetPassword(token, password);
+      history.push('/');
+  })
 
   const passwordConfirmed = password === passwordConfirm;
 
   return (
     <div className="PasswordResetFormStep2">
-      <form onSubmit={handleSubmit}>
+      <p>Reset your password:</p>
+      <form onSubmit={submitHandler}>
         <FormGroup
           intent={error && error.data.password ? 'danger' : 'none'}
           helperText={error && error.data.password}>

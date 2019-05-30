@@ -3,27 +3,23 @@ import useReactRouter from 'use-react-router';
 import { FormGroup, InputGroup, Button, Intent } from '@blueprintjs/core';
 import { observer } from 'mobx-react-lite';
 import { StoreContext } from '../../storePovider';
+import { useForm } from '../../utils/useForm';
 
 const PasswordResetStep1Form = observer(() => {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
   const { app } = useContext(StoreContext);
   const { history } = useReactRouter();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setLoading(true);
-    if(await app.auth.sendPasswordResetEmail(email)) {
-      history.push('/');
-    }
-    setLoading(false);
-  }
+  const { loading, submitHandler } = useForm(async () => {
+    await app.auth.sendPasswordResetEmail(email);
+    history.push('/');
+  });
 
   return (
     <div className="PasswordResetFormStep1">
       <p>Forgot your password? Enter your email and we will send you instructions on how to reset it.</p>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={submitHandler}>
         <FormGroup>
           <InputGroup 
             leftIcon="envelope"

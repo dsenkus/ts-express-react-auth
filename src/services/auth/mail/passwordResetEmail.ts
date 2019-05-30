@@ -13,9 +13,9 @@ function buildEmail(content: string): string {
         .replace('!!!PLACEHOLDER_YEAR!!!', (new Date()).getFullYear().toString())
 };
 
-export async function sendPasswordResetEmail(user: User): Promise<void> {
+export async function sendPasswordResetEmail(user: User, token: string): Promise<void> {
     if(!client) return;
-    const resetLink = createPasswordResetLink(user.reset_password_token)
+    const resetLink = createPasswordResetLink(token);
 
     await client.transmissions.send({
         options: {
