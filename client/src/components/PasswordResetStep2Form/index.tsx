@@ -29,9 +29,10 @@ const PasswordResetFormStep2: FunctionComponent<Props> = observer(({ token }) =>
       <p>Reset your password:</p>
       <form onSubmit={submitHandler}>
         <FormGroup
-          intent={error && error.data.password ? 'danger' : 'none'}
+          intent={error && error.data.password ? Intent.DANGER : Intent.NONE}
           helperText={error && error.data.password}>
           <InputGroup 
+            intent={error && error.data.password ? Intent.DANGER : Intent.NONE}
             leftIcon="more"
             placeholder="Enter your password..."
             value={password}
@@ -42,9 +43,10 @@ const PasswordResetFormStep2: FunctionComponent<Props> = observer(({ token }) =>
         </FormGroup>
 
         <FormGroup
-          intent={!passwordConfirmed ? 'danger' : 'none'}
+          intent={!passwordConfirmed ? Intent.DANGER : Intent.NONE}
           helperText={!passwordConfirmed && 'password confirmation does not match'}>
           <InputGroup 
+            intent={!passwordConfirmed ? Intent.DANGER : Intent.NONE}
             leftIcon="more"
             placeholder="Repeat your password..."
             value={passwordConfirm}
