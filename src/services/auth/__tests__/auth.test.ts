@@ -203,15 +203,52 @@ describe("POST /auth/confirm", (): void => {
     });
 });
 
-describe("POST /auth/reset_password", (): void => {
-    it("it should send password reset email if only email param is provided", async (): Promise<void> => {
+describe("POST /auth/request_password_reset", (): void => {
+    it("it should send password reset email", async (): Promise<void> => {
         const { email } = await createUser();
 
         const result = await request(app)
-            .post('/auth/reset_password')
+            .post('/auth/request_password_reset')
             .send({ email });
 
         expect(result.status).toEqual(HttpStatus.OK);
+    });
+});
+
+describe("POST /auth/change_password", (): void => {
+    it("should change password if user is logged in", async (): Promise<void> => {
+        const user = await createUser();
+        const cookie = await authenticateUser(user);
+        const newPassword = faker.random.alphaNumeric(10)  
+
+        const result = await request(app)
+            .post(`/auth/change_password`)
+            .send({ password: newPassword, confirmPassword: newPassword, currentPassword: user.password })
+            .set('Cookie', [cookie]);
+
+        const updatedUser = await users.findUserByEmail(user.email) as User;
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        expect(updatedUser.password).not.toEqual(user.password);
+        const passwordValid = await isPasswordValid(newPassword, updatedUser.password);
+        expect(passwordValid).toBeTruthy();
+    });
+
+    it("should fail if wrong current password is provided", async (): Promise<void> => {
+        const user = await createUser();
+        const cookie = await authenticateUser(user);
+        const newPassword = faker.random.alphaNumeric(10);  
+
+        const result = await request(app)
+            .post(`/auth/change_password`)
+            .send({ password: newPassword, currentPassword: user.password })
+            .set('Cookie', [cookie]);
+
+        const updatedUser = await users.findUserByEmail(user.email) as User;
+
+        expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+        const passwordValid = await isPasswordValid(user.password, updatedUser.password);
+        expect(passwordValid).toBeTruthy();
     });
 
     it("should reset password if token and password is provided", async (): Promise<void> => {
@@ -220,8 +257,8 @@ describe("POST /auth/reset_password", (): void => {
         const token = generateResetPasswordParam(user)
 
         const result = await request(app)
-            .post(`/auth/reset_password/${token}`)
-            .send({ password: newPassword });
+            .post(`/auth/change_password`)
+            .send({ token, password: newPassword });
 
         const updatedUser = await users.findUserByEmail(user.email) as User;
 
@@ -237,9 +274,8 @@ describe("POST /auth/reset_password", (): void => {
         const token = generateResetPasswordParam(user)
 
         const result = await request(app)
-            .post(`/auth/reset_password/${token}`)
-            .send({ password: newPassword });
-
+            .post(`/auth/change_password`)
+            .send({ token, password: newPassword });
 
         expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
         expect(result.body.error.data.password).toMatch(/must be at least/);
@@ -254,8 +290,11 @@ describe("POST /auth/reset_password", (): void => {
         const { email, password } = await createUser();
 
         const result = await request(app)
-            .post('/auth/reset_password/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-            .send({ password: faker.random.alphaNumeric(10) });
+            .post('/auth/change_password')
+            .send({ 
+                token: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 
+                password: faker.random.alphaNumeric(10) 
+            });
 
         expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
         expect(result.body).toEqual({
@@ -266,5 +305,82 @@ describe("POST /auth/reset_password", (): void => {
         const updatedUser = await users.findUserByEmail(email) as User;
         const passwordValid = await isPasswordValid(password, updatedUser.password);
         expect(passwordValid).toBeTruthy();
+    });
+});
+
+describe("POST /auth/delete_account", (): void => {
+    it("it should delete user account", async (): Promise<void> => {
+        const user = await createUser();
+        const cookie = await authenticateUser(user);
+        const result = await request(app)
+            .post('/auth/delete_account')
+            .send({ password: user.password })
+            .set('Cookie', [cookie]);
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        await expect(users.findUserByEmail(user.email)).rejects.toThrowError('empty result');
+    });
+
+    it("it should not delete other users", async (): Promise<void> => {
+        const user = await createUser();
+        const user2 = await createUser();
+        const cookie = await authenticateUser(user);
+        const result = await request(app)
+            .post('/auth/delete_account')
+            .send({ password: user.password })
+            .set('Cookie', [cookie]);
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        await expect(users.findUserByEmail(user2.email)).resolves.toHaveProperty('name', user2.name);
+    });
+
+    it("it should fail when password incorrect", async (): Promise<void> => {
+        const user = await createUser();
+        const cookie = await authenticateUser(user);
+        const result = await request(app)
+            .post('/auth/delete_account')
+            .send({ password: 'invalid' })
+            .set('Cookie', [cookie]);
+
+        expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+        expect(result.body.error.data.password).toMatch(/incorrect/);
+    });
+
+    it("it should fail when unauthenticated", async (): Promise<void> => {
+        const user = await createUser();
+        const result = await request(app)
+            .post('/auth/delete_account');
+
+        expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
+        expect(result.body).toEqual({
+            error: buildErrorJson(new UnauthorizedError())
+        });
+    });
+});
+
+describe("POST /auth/update_profile", (): void => {
+    it("it should update user data", async (): Promise<void> => {
+        const user = await createUser();
+        const cookie = await authenticateUser(user);
+        const name = 'John McDoe';
+        const result = await request(app)
+            .post('/auth/update_profile')
+            .send({ name })
+            .set('Cookie', [cookie]);
+
+        expect(result.status).toEqual(HttpStatus.OK);
+        expect(result.body.user).toEqual(users.serializeAuthUser({ ...user, name }));
+        await expect(users.findUserByEmail(user.email)).resolves.toHaveProperty('name', name)
+    });
+
+    it("it should fail when unauthenticated", async (): Promise<void> => {
+        const user = await createUser();
+        const result = await request(app)
+            .post('/auth/update_profile');
+
+        expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
+        expect(result.body).toEqual({
+            error: buildErrorJson(new UnauthorizedError())
+        });
     });
 });

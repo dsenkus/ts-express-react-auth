@@ -23,6 +23,7 @@ app.use(session({
     secret: config.get('redis.secret'),
     cookie: {
         secure: config.get('app.secureCookie'),
+        sameSite: 'lax',
     },
     resave: false,
     saveUninitialized: false
@@ -57,7 +58,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Cors
 // ----------------------------------------------------------------------------- 
 // TODO: disable in production
-app.use(cors());
+app.use(cors({ 
+    origin: true,
+    credentials: true,
+}));
 
 // Routes
 // ----------------------------------------------------------------------------- 

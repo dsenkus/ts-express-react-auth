@@ -1,0 +1,37 @@
+.AppAuthenticated {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: auto;
+  grid-template-rows: 50px auto 3rem;
+  grid-template-areas: "header" "main" "footer"; }
+  .AppAuthenticated-Content {
+    grid-area: main;
+    background: #EEEFF3; }
+  .AppAuthenticated-Wrapper {
+    padding: 24px;
+    max-width: 1000px; }
+  .AppAuthenticated-Header {
+    grid-area: header; }
+  .AppAuthenticated-Footer {
+    background: #EEEFF3;
+    display: flex;
+    align-items: center;
+    grid-area: footer; }
+    .AppAuthenticated-Footer .Footer {
+      flex-grow: 1; }
+  .AppAuthenticated--withSidebar {
+    grid-template-rows: 50px auto;
+    grid-template-areas: "header" "main"; }
+    .AppAuthenticated--withSidebar .AppAuthenticated-Sidebar {
+      grid-area: main footer; }
+    .AppAuthenticated--withSidebar .AppAuthenticated-Content {
+      display: none; }
+    .AppAuthenticated--withSidebar .AppAuthenticated-Footer {
+      display: none; }
+
+@media (min-width: 960px) {
+  .AppAuthenticated {
+    grid-template-columns: 270px auto;
+    grid-template-areas: "header header" "sidebar main" "sidebar footer"; }
+    .AppAuthenticated-Sidebar {
+      grid-area: sidebar; } }

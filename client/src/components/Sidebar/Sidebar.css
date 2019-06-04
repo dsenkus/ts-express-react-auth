@@ -1,0 +1,29 @@
+.Sidebar {
+  background: #fff; }
+
+.Sidebar .menu {
+  list-style-type: none;
+  font-size: 0.9rem;
+  padding: 0;
+  margin: 0; }
+  .Sidebar .menu li:first-child a {
+    border-top: 1px dashed #eee; }
+  .Sidebar .menu a {
+    color: #555;
+    display: flex;
+    border-bottom: 1px dashed #eee;
+    border-left: 5px solid #fff;
+    height: 3rem;
+    padding: 0 24px;
+    overflow: hidden;
+    align-items: center; }
+    .Sidebar .menu a:hover {
+      text-decoration: none; }
+    .Sidebar .menu a.active {
+      background: #EEEFF3;
+      border-left: 5px solid #394b59;
+      color: #333;
+      font-weight: 500; }
+      .Sidebar .menu a.active .chevron {
+        color: #555;
+        margin-left: auto; }

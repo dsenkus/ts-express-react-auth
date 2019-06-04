@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import 'tachyons/css/tachyons.min.css';
+import 'flexboxgrid/css/flexboxgrid.min.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './components/App/App';

@@ -17,6 +17,7 @@ export const useForm = (submit: submitFunction) => {
 
     try {
       await submit();
+      setError(null);
     } catch (e) {
       if(isJsonError(e) && isValidationError(e)) {
         setError(e.response.data.error);

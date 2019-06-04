@@ -2,6 +2,7 @@ import { User } from "../database";
 
 export type UserAuthData = Pick<User, 'id' | 'email' | 'name'>
 export type UserCreateData = Pick<User, 'email' | 'password' | 'name'>
+export type UserUpdateData = Pick<User, 'name'>
 export type UserCreateDataOptional = Partial<UserCreateData>
 
 export type JsonErrorTypes = 'ApplicationError' | 'InternalServerError' | 'InvalidAuthCredentialsError' |
@@ -30,4 +31,9 @@ export interface AuthLoginResponse extends BaseResponse {
     user: UserAuthData;
 }
 export interface AuthLogoutResponse extends BaseResponse {}
-export interface AuthResetPasswordResponse extends BaseResponse {}
+export interface AuthRequestPasswordResetResponse extends BaseResponse {}
+export interface AuthChangePasswordResponse extends BaseResponse {}
+export interface AuthDeleteAccountResponse extends BaseResponse {}
+export interface AuthUpdateProfileResponse extends BaseResponse {
+    user: UserAuthData;
+}

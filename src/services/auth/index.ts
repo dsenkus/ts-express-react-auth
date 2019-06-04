@@ -3,12 +3,14 @@ import * as config from 'config';
 import Router from 'express-promise-router';
 import users from '../../entities/users';
 import { InvalidAuthCredentialsError, InvalidConfirmationTokenError, InvalidPasswordResetTokenError } from '../../utils/httpErrors';
-import { userCreateSchema, userPasswordChangeSchema } from '../../entities/users/validators';
+import { userCreateSchema, userPasswordResetSchema, userUpdateSchema, userPasswordChangeSchema, userDeleteAccountSchema } from '../../entities/users/validators';
 import { isAuthenticated, generateResetPasswordParam } from '../../utils';
 import { parseResetPasswordParam } from '../../utils';
 import { sendPasswordResetEmail } from './mail/passwordResetEmail';
 import { logger } from '../../logger';
-import { AuthWhoamiResponse, AuthRegisterResponse, AuthConfirmResponse, AuthLoginResponse, AuthLogoutResponse, AuthResetPasswordResponse } from '../../../types/common';
+import { AuthWhoamiResponse, AuthRegisterResponse, AuthConfirmResponse, AuthLoginResponse, AuthLogoutResponse, AuthRequestPasswordResetResponse, AuthDeleteAccountResponse, AuthUpdateProfileResponse } from '../../../types/common';
+import { User } from '../../../types/database';
+import { serializeAuthUser } from '../../entities/users/serializers';
 
 const router = Router();
 
@@ -94,10 +96,10 @@ router.post('/logout', isAuthenticated, async (req, res): Promise<void> => {
 });
 
 // -----------------------------------------------------------------------------
-// POST /auth/reset_password :: Send reset password email
+// POST /auth/request_password_reset :: Send reset password email
 // -----------------------------------------------------------------------------
 
-router.post('/reset_password', async (req, res): Promise<void> => {
+router.post('/request_password_reset', async (req, res): Promise<void> => {
     const { email } = req.body;
 
     try {
@@ -109,31 +111,69 @@ router.post('/reset_password', async (req, res): Promise<void> => {
         // ignore errors, so action always succeeds. Prevents email fishing.
     }
 
-    const response: AuthResetPasswordResponse = { success: true };
+    const response: AuthRequestPasswordResetResponse = { success: true };
     res.json(response);
 });
 
 // -----------------------------------------------------------------------------
-// POST /auth/reset_password/:token :: Reset user password
+// POST /auth/change_password :: Change user password
 // -----------------------------------------------------------------------------
 
-router.post('/reset_password/:token', async (req, res): Promise<void> => {
-    const { password } = req.body;
-    const { token } = req.params;
+router.post('/change_password', async (req, res): Promise<void> => {
+    const { token, password, currentPassword, confirmPassword } = req.body;
 
     // validate password
-    await userPasswordChangeSchema.validate(req.body, { abortEarly: false });
-
-    // parse token
-    try {
-        const tokenData = parseResetPasswordParam(token);
-        const user = await users.resetPasswordWithToken(tokenData.id, tokenData.token, password);
-        logger.log('info', `Password reseted by ${user.email}`);
-    } catch(err) {
-        throw new InvalidPasswordResetTokenError();
+    if(req.user)  {
+        await userPasswordChangeSchema(req.user).validate({ password, currentPassword, confirmPassword }, { abortEarly: false });
+        await users.changePassword(req.user.id, password);
+        logger.log('info', `Password changed for ${req.user.email} (authenticated)`);
+    } else if(token) {
+        await userPasswordResetSchema.validate(req.body, { abortEarly: false });
+        try {
+            const tokenData = parseResetPasswordParam(token);
+            const user = await users.resetPasswordWithToken(tokenData.id, tokenData.token, password);
+            logger.log('info', `Password changed for ${user.email} (reset token)`);
+        } catch(err) {
+            throw new InvalidPasswordResetTokenError();
+        }
     }
 
-    const response: AuthResetPasswordResponse = { success: true };
+
+    const response: AuthRequestPasswordResetResponse = { success: true };
+    res.json(response);
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/update_profile :: Update user profile data
+// -----------------------------------------------------------------------------
+
+router.post('/update_profile', isAuthenticated, async (req, res, next): Promise<void> => {
+    await userUpdateSchema.validate(req.body, { abortEarly: false });
+
+    const user = await users.updateUserProfile(req.user.id, req.body);
+
+    req.logIn(user, (err): any => {
+        if (err) return next(err);
+
+        const response: AuthUpdateProfileResponse = { 
+            success: true,
+            user: serializeAuthUser(user)
+        };
+        res.json(response);
+    });
+});
+
+// -----------------------------------------------------------------------------
+// POST /auth/delete_account :: Delete your account
+// -----------------------------------------------------------------------------
+
+router.post('/delete_account', isAuthenticated, async (req, res): Promise<void> => {
+    const user: User = req.user;
+
+    await userDeleteAccountSchema(user).validate(req.body, { abortEarly: false });
+    await users.deleteUser(user.id);
+
+    const response: AuthDeleteAccountResponse = { success: true };
     res.json(response);
 });
 

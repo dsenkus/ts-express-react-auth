@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserCreateData } from '../../types/common';
+import { UserCreateData, UserUpdateData } from '../../types/common';
 import { store } from './storePovider';
 
 const instance = axios.create({
@@ -8,6 +8,7 @@ const instance = axios.create({
   headers: {
     'content-type': 'application/json' 
   },
+  withCredentials: true,
 });
 
 instance.interceptors.request.use((request) => {
@@ -35,21 +36,41 @@ const auth = {
     });
   },
 
+  logout: function() {
+    return instance.post(`/auth/logout`);
+  },
+
+  whoami: function() {
+    return instance.get(`/auth/whoami`);
+  },
+
   confirm: function(token: string) {
-    return instance.post(`/auth/confirm/`, { token });
+    return instance.post(`/auth/confirm`, { token });
   },
 
   register: function(data: UserCreateData) {
     return instance.post(`/auth/register`, data);
   },
 
-  sendPasswordResetEmail: (email: string) => {
-    return instance.post(`/auth/reset_password`, { email });
+  updateProfile: function(data: UserUpdateData) {
+    return instance.post(`/auth/update_profile`, data);
   },
 
-  changePassword: (token: string, password: string) => {
-    return instance.post(`/auth/reset_password/${token}`, { password });
-  }
+  sendPasswordResetEmail: (email: string) => {
+    return instance.post(`/auth/request_password_reset`, { email });
+  },
+
+  resetPassword: (token: string, password: string) => {
+    return instance.post(`/auth/change_password`, { token, password });
+  },
+
+  changePassword: (password: string, currentPassword: string, confirmPassword: string) => {
+    return instance.post(`/auth/change_password`, { password, currentPassword, confirmPassword });
+  },
+
+  deleteAccount: (password: string) => {
+    return instance.post(`/auth/delete_account`, { password });
+  },
 }
 
 export const api = {
