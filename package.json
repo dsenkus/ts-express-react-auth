@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "NODE_ENV=production npx pm2 start pm2.yaml",
-    "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.test.ts' --exec 'ts-node --files' ./src/server.ts",
+    "dev": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.test.ts' --exec 'ts-node --files' ./src/server.ts",
     "build": "tsc",
     "serve": "ts-node src/server.ts",
     "test": "NODE_ENV=test jest --runInBand",
@@ -40,7 +40,6 @@
     "@typescript-eslint/parser": "^1.7.0",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
-    "config": "^3.1.0",
     "connect-redis": "^3.4.1",
     "date-fns": "^1.30.1",
     "eslint": "^5.16.0",
@@ -89,8 +88,10 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.5",
+    "@types/dotenv": "^6.1.1",
     "cors": "^2.8.5",
     "create-react-app": "^3.0.1",
+    "dotenv": "^8.0.0",
     "pm2": "^3.5.0"
   }
 }

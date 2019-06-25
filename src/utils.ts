@@ -1,4 +1,3 @@
-import * as config from 'config';
 import * as bcrypt from 'bcrypt';
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "./utils/httpErrors";
@@ -58,7 +57,7 @@ export async function queryFirstOrError<T>(sql: string, values?: any[]): Promise
  * Returns reset password link.
  */
 export const createPasswordResetLink = (token: string): string => (
-    `${config.get('app.siteUrl')}/password-reset/${token}`
+    `${process.env.APP_SITE_URL}/password-reset/${token}`
 );
 
 /**

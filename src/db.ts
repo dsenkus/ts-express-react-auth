@@ -1,8 +1,7 @@
-import * as config from 'config';
 import { Pool, QueryResult } from 'pg';
 import { logger } from './logger';
 
-const pool = new Pool({ connectionString: config.get('db.uri') });
+const pool = new Pool({ connectionString: process.env.DB_URI });
 logger.log('info', 'Database connection initiated');
 
 export class DbError extends Error {

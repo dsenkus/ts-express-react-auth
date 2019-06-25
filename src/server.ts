@@ -1,4 +1,3 @@
-import * as config from 'config';
 import app from "./app";
 import { logger } from './logger';
 
@@ -12,6 +11,6 @@ process.on("unhandledRejection", (error): void => {
     process.exit(1);
 });
 
-export const server = app.listen(config.get('app.port'), (): void => {
-    logger.log('info', `Server started on port ${config.get('app.port')}`);
+export const server = app.listen(process.env.APP_PORT, (): void => {
+    logger.log('info', `Server started on port ${process.env.APP_PORT}`);
 });

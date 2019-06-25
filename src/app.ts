@@ -1,11 +1,12 @@
 import * as bodyParser from 'body-parser';
-import * as config from 'config';
 import * as express from 'express';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
 import * as cors from 'cors';
 import auth from './services/auth';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { buildErrorJson } from './utils/httpErrors';
 import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
@@ -14,15 +15,19 @@ import { logger } from './logger';
 import { DbError } from './db';
 import { User } from '../types/database';
 
+if(process.env.NODE_ENV !== 'production') {
+    dotenv.config({ path: path.resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) })
+}
+
 const app = express();
 
 // session middleware
 // ----------------------------------------------------------------------------- 
 app.use(session({
     store: redisStore,
-    secret: config.get('redis.secret'),
+    secret: process.env.REDIS_SECRET,
     cookie: {
-        secure: config.get('app.secureCookie'),
+        secure: process.env.APP_SECURE_COOKIE,
         sameSite: 'lax',
     },
     resave: false,

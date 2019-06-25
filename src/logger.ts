@@ -1,4 +1,3 @@
-import * as config from 'config';
 import * as winston from 'winston';
 
 export const logger = winston.createLogger({
@@ -7,7 +6,7 @@ export const logger = winston.createLogger({
     transports: []
 });
 
-if(config.get('logger.logToFile')) {
+if(process.env.LOGGER_LOG_TO_FILE) {
     logger.add(new winston.transports.File({ 
         filename: 'error.log', 
         level: 'error' 
@@ -17,7 +16,7 @@ if(config.get('logger.logToFile')) {
     }));
 }
 
-if(config.get('logger.logToConsole')) {
+if(process.env.LOGGER_LOG_TO_CONSOLE) {
     logger.add(new winston.transports.Console({
         format: winston.format.simple()
     }));
