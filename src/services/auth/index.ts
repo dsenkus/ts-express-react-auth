@@ -105,7 +105,7 @@ router.post('/request_password_reset', async (req, res): Promise<void> => {
         const user = await users.generateResetPasswordToken(email);
         const token = generateResetPasswordParam(user);
         logger.log('info', `Reset Password requested by ${user.email} (reset token: ${token})`);
-        if(process.env.APP_SEND_MAIL) sendPasswordResetEmail(user, token);
+        if(process.env.APP_SEND_MAIL === 'true') sendPasswordResetEmail(user, token);
     } catch(err) {
         // ignore errors, so action always succeeds. Prevents email fishing.
     }

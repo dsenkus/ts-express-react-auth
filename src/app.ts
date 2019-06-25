@@ -27,7 +27,7 @@ app.use(session({
     store: redisStore,
     secret: process.env.REDIS_SECRET,
     cookie: {
-        secure: process.env.APP_SECURE_COOKIE,
+        secure: process.env.APP_SECURE_COOKIE === 'true',
         sameSite: 'lax',
     },
     resave: false,

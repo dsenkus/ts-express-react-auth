@@ -1,6 +1,5 @@
 import { createUser } from "../utils";
 import { generateResetPasswordParam, parseResetPasswordParam, pick } from "../../src/utils";
-import { string } from "yup";
 
 describe("generateResetPasswordParam", (): void => {
     it("should generate correct value", async (): Promise<void> => {

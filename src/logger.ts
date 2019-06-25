@@ -6,7 +6,7 @@ export const logger = winston.createLogger({
     transports: []
 });
 
-if(process.env.LOGGER_LOG_TO_FILE) {
+if(process.env.LOGGER_LOG_TO_FILE === 'true') {
     logger.add(new winston.transports.File({ 
         filename: 'error.log', 
         level: 'error' 
@@ -16,7 +16,7 @@ if(process.env.LOGGER_LOG_TO_FILE) {
     }));
 }
 
-if(process.env.LOGGER_LOG_TO_CONSOLE) {
+if(process.env.LOGGER_LOG_TO_CONSOLE === 'true') {
     logger.add(new winston.transports.Console({
         format: winston.format.simple()
     }));

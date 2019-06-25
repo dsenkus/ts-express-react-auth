@@ -66,6 +66,9 @@
     "setupFilesAfterEnv": [
       "<rootDir>/test/setupTests.ts"
     ],
+    "setupFiles": [
+      "<rootDir>/test/dotenvConfig.ts"
+    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",
