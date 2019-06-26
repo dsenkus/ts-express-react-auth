@@ -1,3 +1,10 @@
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+if(process.env.NODE_ENV !== 'production') {
+    dotenv.config({ path: path.resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) })
+}
+
 import app from "./app";
 import { logger } from './logger';
 

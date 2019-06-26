@@ -1,6 +1,30 @@
-# TypeScript React/Express boilerplate with authentication
+# TypeScript React/ExpressJS boilerplate with authentication
+
+![Screenshot](https://imgur.com/5MLM21p)
 
 Work in progress...
+
+## Features
+
+- Developed with TypeScript
+- Express.js backend
+- React/MobX frontend
+- Redis
+- Passport.js user registration/authentication
+- Account confirmation via email
+- Password reset capabilities
+- Jest tests
+- SparkPost integration
+- Docker PostgreSQL database with Adminer (http://localhost:8080)
+
+## How to start?
+
+```
+$ docker-composer up -d
+$ npm run dev
+$ cd client
+$ npm start
+```
 
 ## TODO
 

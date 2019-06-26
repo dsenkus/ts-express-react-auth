@@ -12,7 +12,7 @@ const Sidebar = observer(() => {
 
   return (
     <div className="Sidebar">
-      <h3 className="mt4 mb3 f6 padh">COLLECTIONS</h3>
+      <h3 className="mt4 mb3 f6 padh">SIDEBAR MENU</h3>
 
       <h3 className="mt4 mb3 f6 padh">MY MENU</h3>
       <ul className="menu">

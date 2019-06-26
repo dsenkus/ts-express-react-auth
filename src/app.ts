@@ -5,8 +5,6 @@ import * as session from 'express-session';
 import * as HttpStatus from 'http-status-codes';
 import * as cors from 'cors';
 import auth from './services/auth';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 import { buildErrorJson } from './utils/httpErrors';
 import { localAuthStrategy } from './services/auth/strategies/local';
 import { NextFunction, Request, Response } from 'express';
@@ -14,10 +12,6 @@ import { redisStore } from './redis';
 import { logger } from './logger';
 import { DbError } from './db';
 import { User } from '../types/database';
-
-if(process.env.NODE_ENV !== 'production') {
-    dotenv.config({ path: path.resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) })
-}
 
 const app = express();
 
