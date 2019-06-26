@@ -1,6 +1,6 @@
 # TypeScript React/ExpressJS boilerplate with authentication
 
-![Screenshot](https://imgur.com/5MLM21p)
+[Screenshot](https://i.imgur.com/5MLM21p.png)
 
 Work in progress...
 
