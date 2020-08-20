@@ -38,7 +38,7 @@
     "@types/yup": "^0.26.13",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "connect-redis": "^3.4.1",
     "date-fns": "^1.30.1",
